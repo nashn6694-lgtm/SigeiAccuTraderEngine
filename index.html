@@ -1,0 +1,2905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚡ Accumulator AutoTrader by Antony ⚡</title>
+<link rel="icon" href="/Ca.ico" type="image/x-icon">
+<link rel="shortcut icon" href="/Ca.ico" type="image/x-icon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a1a; --panel:rgba(10,10,30,0.72);
+    --cyan:#00f0ff; --magenta:#ff00ff; --green:#00ff80;
+    --red:#ff0040; --amber:#ffaa00; --text:#c0c8e0;
+    --dim:#8890b0; --input-bg:#15152a; --border:#2a2a5a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(circle at 15% -10%, #191945 0%, #0a0a1a 45%, #05050d 100%);
+    color:var(--text); font-family:"Segoe UI", Helvetica, Arial, sans-serif;
+    font-size:14px; min-height:100vh; padding:14px 16px 20px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .topbar{ text-align:center; margin-bottom:14px; position:relative; }
+  .topbar h1{
+    font-family:"Orbitron","Segoe UI",monospace; font-size:20px;
+    font-weight:900; letter-spacing:0.14em; margin:0; color:#eaf6ff;
+    text-shadow:0 0 6px var(--cyan), 0 0 18px rgba(0,240,255,0.55), 0 0 34px rgba(255,0,255,0.35);
+  }
+  .topbar .byline{
+    font-size:12px; letter-spacing:0.28em; color:var(--magenta);
+    text-shadow:0 0 10px rgba(255,0,255,0.7); display:block; margin-top:6px;
+  }
+
+  .tabs{ display:flex; gap:3px; border-bottom:1px solid var(--border); margin-bottom:16px; flex-wrap:wrap; }
+  .tab{
+    background:#0d0d22; color:var(--dim); border:1px solid #1a1a3a; border-bottom:none;
+    border-radius:7px 7px 0 0; padding:9px 20px; font-weight:700; font-size:13px;
+    letter-spacing:0.05em; cursor:pointer; font-family:inherit; transition:all .18s ease;
+  }
+  .tab:hover{ background:#1a1a3a; color:#aab0d0; }
+  .tab.active{
+    background:#1a1a3a; color:var(--cyan); border-color:var(--cyan);
+    box-shadow:0 -2px 14px rgba(0,240,255,0.35); text-shadow:0 0 8px rgba(0,240,255,0.8);
+  }
+  .tab-panel{ display:none; }
+  .tab-panel.active{ display:block; animation:fadeIn .25s ease; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+  .panel{
+    background:var(--panel); border:1px solid var(--magenta); border-radius:8px;
+    padding:16px; margin-top:14px; position:relative;
+    box-shadow:0 0 14px rgba(255,0,255,0.08), inset 0 0 26px rgba(0,240,255,0.03);
+  }
+  .panel-title{
+    position:absolute; top:-10px; left:12px; background:var(--bg); padding:0 8px;
+    color:var(--magenta); font-weight:700; font-size:11.5px; letter-spacing:0.10em;
+    text-shadow:0 0 8px rgba(255,0,255,0.7); white-space:nowrap;
+  }
+  .panel.cyan{ border-color:var(--cyan); }
+  .panel.cyan .panel-title{ color:var(--cyan); text-shadow:0 0 8px rgba(0,240,255,0.7); }
+  .row{ display:flex; gap:14px; align-items:stretch; flex-wrap:wrap; }
+  .grow{ flex:1 1 auto; } .spacer{ flex:1 1 auto; }
+  .auth-inner{ display:flex; flex-direction:column; gap:10px; }
+  .auth-method-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:2px;}
+  .auth-method-row label{color:var(--dim);font-size:12px;font-weight:700;}
+  #authMethod{display:none;}
+  .auth-choice-panel{display:flex;gap:10px;flex-wrap:wrap;}
+  .auth-choice-panel button{flex:1 1 220px;min-height:42px;}
+  .btn-pat-choice{border-color:#a855f7;color:#e0b8ff;background:#17102a;}
+  .btn-pat-choice:hover:not(:disabled){border-color:#d8a8ff;background:#24143c;box-shadow:0 0 14px rgba(168,85,247,.35);}
+  .btn-back-auth{margin-right:auto;background:transparent;border-color:#3a3a8a;color:var(--dim);}
+  .auth-option{display:flex;align-items:center;gap:7px;padding:7px 11px;border:1px solid var(--border);border-radius:7px;background:#0d0d22;color:var(--dim);cursor:pointer;transition:all .18s ease;}
+  .auth-option:hover{border-color:var(--cyan);color:#c0c8e0;}
+  .auth-option.active{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 10px rgba(0,240,255,.18);}
+  .auth-option input{accent-color:var(--cyan);}
+  .auth-mode-panel{display:none !important;}
+  .auth-mode-panel.active{display:flex !important;}
+  .oauth-info{flex:1 1 260px;min-width:220px;color:var(--dim);font-size:12px;line-height:1.5;padding:8px 10px;background:rgba(10,10,30,.45);border:1px solid var(--border);border-radius:7px;}
+  .btn-oauth{background:#16334a;border-color:#38bdf8;color:#8edfff;text-shadow:0 0 8px rgba(56,189,248,.45);}
+  .btn-oauth:hover:not(:disabled){background:#1d465f;border-color:#8edfff;box-shadow:0 0 14px rgba(56,189,248,.4);}
+  .oauth-badge{display:inline-block;margin-left:6px;padding:2px 6px;border:1px solid #335577;border-radius:10px;color:#88ccff;font-size:10px;letter-spacing:.04em;}
+  .auth-line{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .auth-line label{
+    color:var(--cyan); font-weight:700; letter-spacing:.05em;
+    min-width:80px; font-size:12.5px;
+  }
+  .status-frame{
+    display:flex; align-items:center; gap:10px;
+    background:rgba(10,10,30,0.55); border:1px solid var(--border);
+    border-radius:10px; padding:12px 18px; min-width:170px;
+  }
+  .led{
+    width:16px; height:16px; border-radius:50%; background:var(--red);
+    box-shadow:0 0 10px var(--red); display:inline-block; opacity:.35;
+    transition:background .3s, box-shadow .3s;
+  }
+  .led.online{
+    background:var(--green);
+    box-shadow:0 0 12px var(--green), 0 0 26px rgba(0,255,128,.55);
+    animation:pulse 1s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{opacity:.35;transform:scale(.92);} 50%{opacity:1;transform:scale(1.08);} }
+  #statusLabel{ font-weight:800; letter-spacing:.10em; font-size:12.5px; }
+  #statusLabel.online{ color:var(--green); text-shadow:0 0 10px rgba(0,255,128,.8); }
+  #statusLabel.offline{ color:#ff5566; }
+  input[type=text], input[type=password], input[type=number], select, textarea{
+    background:var(--input-bg); color:#d0d8f0; border:1px solid var(--border);
+    border-radius:6px; padding:7px 10px; font-family:inherit; font-size:13px;
+    outline:none; transition:border-color .18s, box-shadow .18s, background .18s;
+  }
+  input:focus, select:focus, textarea:focus{
+    border-color:var(--cyan); background:#1a1a3a; box-shadow:0 0 10px rgba(0,240,255,.35);
+  }
+  input:disabled, select:disabled{ opacity:.5; cursor:not-allowed; }
+  #patInput{
+    flex:1 1 320px; min-width:220px;
+    background:#0d0d22; border-color:#3a3a8a;
+    font-family:Consolas,monospace; font-size:12px;
+  }
+  #patInput:focus{
+    border-color:var(--magenta); box-shadow:0 0 10px rgba(255,0,255,.35);
+  }
+  button{
+    font-family:inherit; font-weight:700; font-size:12.5px; letter-spacing:.05em;
+    border-radius:8px; padding:8px 18px; cursor:pointer; transition:all .18s ease;
+    background:#1a1a3a; border:1px solid #3a3a8a; color:var(--text);
+  }
+  button:hover:not(:disabled){ background:#2a2a5a; border-color:var(--cyan); }
+  button:active:not(:disabled){ transform:translateY(1px); }
+  button:disabled{ background:#1a1a2a; border-color:#3a3a5a; color:#6a6a8a; cursor:not-allowed; }
+  .btn-connect{ background:#003344; border-color:#00aacc; color:var(--cyan); text-shadow:0 0 8px rgba(0,240,255,.6); }
+  .btn-connect:hover:not(:disabled){ background:#004455; border-color:var(--cyan); box-shadow:0 0 14px rgba(0,240,255,.5); }
+  .btn-disconnect{ background:#441122; border-color:#cc4466; color:#ff6688; }
+  .btn-disconnect:hover:not(:disabled){ background:#551133; border-color:#ff6688; box-shadow:0 0 14px rgba(255,102,136,.45); }
+  .btn-manual{ background:#2a1a4a; border-color:#aa44ff; color:#cc88ff; }
+  .btn-manual:hover:not(:disabled){ background:#3a2a5a; border-color:#cc88ff; box-shadow:0 0 14px rgba(204,136,255,.5); }
+  .btn-refresh{ background:#1a2a3a; border-color:#44aaff; color:#88ccff; }
+  .btn-refresh:hover:not(:disabled){ background:#2a3a4a; border-color:#88ccff; box-shadow:0 0 14px rgba(136,204,255,.5); }
+  .btn-lock{ background:#3a2a1a; border-color:#aa8844; color:#ffcc88; }
+  .btn-lock:hover:not(:disabled){ background:#4a361f; border-color:#ffaa66; box-shadow:0 0 14px rgba(255,170,102,.5); }
+  .btn-tiny{ font-size:11px; padding:4px 10px; }
+  #autoTradeBtn{
+    min-width:96px; background:var(--red); border:1px solid var(--red); color:#fff;
+    box-shadow:0 0 14px rgba(255,0,64,.6);
+    transition:background .35s ease, border-color .35s ease, box-shadow .35s ease, color .35s ease;
+  }
+  #autoTradeBtn.on{
+    background:var(--green); border-color:var(--green); color:#032a17;
+    box-shadow:0 0 18px rgba(0,255,128,.75);
+  }
+  .info-row{
+    display:flex; align-items:center; gap:22px; flex-wrap:wrap; margin-top:16px;
+    padding:10px 14px; background:rgba(10,10,30,0.5);
+    border:1px solid var(--border); border-radius:8px;
+  }
+  .lbl-balance{ font-size:17px; font-weight:800; color:var(--cyan); text-shadow:0 0 10px rgba(0,240,255,.6); }
+  .lbl-price  { font-size:15px; font-weight:800; color:var(--amber); text-shadow:0 0 10px rgba(255,170,0,.5); }
+  .lbl-digit  { font-size:15px; font-weight:800; color:#ff44ff; text-shadow:0 0 10px rgba(255,68,255,.5); }
+  .info-row label{ color:var(--dim); font-size:12.5px; }
+  .form-grid{ display:grid; grid-template-columns:130px 1fr; gap:12px 16px; align-items:center; margin-top:4px; }
+  .form-grid > label{ text-align:right; color:#9aa4c8; font-size:13px; font-weight:600; }
+  .field-row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .field-row .unit{ color:var(--dim); font-size:12.5px; }
+  .engine-row{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  .engine-row label{ color:#9aa4c8; font-weight:600; }
+  .log-box{
+    background:#0a0a18; border:1px solid #1a1a4a; border-radius:6px; color:#b0b8d0;
+    font-family:"Consolas","Courier New",monospace; font-size:12px; line-height:1.5;
+    height:260px; overflow-y:auto; padding:10px 12px; white-space:pre-wrap; word-break:break-word;
+  }
+  .log-box .t{ color:#556; }
+  .log-box .err{ color:#ff6b81; }
+  .log-box .ok { color:#8ef0b8; }
+  .log-box .dbg{ color:#88aaff; }
+  table{ width:100%; border-collapse:collapse; background:#0d0d22; border:1px solid var(--border); border-radius:6px; overflow:hidden; font-size:12.5px; }
+  thead th{ background:#0a0a1a; color:var(--cyan); border-bottom:1px solid var(--border); padding:8px 10px; text-align:left; font-weight:700; letter-spacing:.04em; font-size:11.5px; text-transform:uppercase; }
+  tbody td{ padding:7px 10px; border-bottom:1px solid #191933; color:#c0c8e0; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:#12122b; }
+  .pl-pos{ color:var(--green); font-weight:700; text-shadow:0 0 8px rgba(0,255,128,.5); }
+  .pl-neg{ color:#ff5566; font-weight:700; text-shadow:0 0 8px rgba(255,85,102,.5); }
+  .stat-won{ color:var(--green); font-size:15px; font-weight:700; text-shadow:0 0 10px rgba(0,255,128,.5); }
+  .stat-lost{ color:#ff5555; font-size:15px; font-weight:700; text-shadow:0 0 10px rgba(255,85,85,.5); }
+  .stat-pl{ font-size:17px; font-weight:900; }
+  .stats-inner{ display:flex; flex-direction:column; gap:16px; justify-content:center; height:100%; padding:10px 4px; }
+  .bottom-row{ display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,0.85fr); gap:16px; align-items:stretch; }
+  @media (max-width:860px){
+    .bottom-row{ grid-template-columns:1fr; }
+    .form-grid{ grid-template-columns:1fr; }
+    .form-grid > label{ text-align:left; }
+  }
+  .cyber-title{
+    font-family:"Orbitron", monospace; font-size:19px; font-weight:900; text-align:center;
+    letter-spacing:.12em; color:var(--magenta);
+    text-shadow:0 0 10px rgba(255,0,255,.7), 0 0 26px rgba(255,0,255,.35);
+    margin:6px 0 14px;
+  }
+  .markup-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:16px; margin-top:6px; }
+  .markup-card{ background:rgba(13,13,34,0.85); border:1px solid #2a2a5a; border-radius:8px; padding:16px; text-align:center; }
+  .markup-card .k{ font-size:11.5px; letter-spacing:.10em; color:var(--dim); text-transform:uppercase; }
+  .markup-card .v{ font-size:19px; font-weight:800; color:#88ccff; margin-top:8px; }
+  .markup-card.hi .v{ color:var(--amber); font-size:23px; text-shadow:0 0 12px rgba(255,204,0,.6); }
+  #mStatus{ margin-top:14px; font-size:13px; color:#88aaff; }
+  #mConnState{
+    margin-top:10px; padding:8px 12px; border-radius:6px;
+    font-size:12px; font-family:Consolas,monospace;
+    background:rgba(10,10,30,0.6); border:1px solid var(--border);
+  }
+  #mConnState.off{ color:#ff8899; border-color:#663333; }
+  #mConnState.on { color:#88ffaa; border-color:#335533; }
+  #mConnState.info{ color:#88aaff; border-color:#2a4a6a; }
+  .markup-app-picker{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:0 0 14px; }
+  .markup-app-picker label{ color:var(--cyan); font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+  #markupAppIdSelect{ flex:1 1 300px; min-width:240px; max-width:520px; }
+  .markup-app-badge{ color:var(--dim); font-family:Consolas,monospace; font-size:11px; }
+
+  .markup-lock-inner{ padding:10px 6px 6px; }
+  .markup-lock-text{
+    color:var(--dim); font-size:13.5px; margin:0 0 18px; line-height:1.65;
+    text-align:center;
+  }
+  .markup-lock-row{
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:center;
+  }
+  #markupPassword{
+    flex:1 1 240px; max-width:340px; min-width:180px;
+    background:#0d0d22; border:1px solid #3a3a8a;
+    font-family:Consolas,monospace;
+    letter-spacing:0.35em; font-size:15px; text-align:center;
+    padding:11px 14px;
+  }
+  #markupPassword:focus{
+    border-color:var(--magenta);
+    box-shadow:0 0 14px rgba(255,0,255,.4);
+    background:#1a1a3a;
+  }
+  .markup-lock-error{
+    color:#ff5566; font-size:12.5px; margin-top:14px;
+    padding:10px 14px; background:rgba(255,0,64,0.08);
+    border:1px solid rgba(255,0,64,0.35); border-radius:6px;
+    display:none; text-align:center;
+  }
+  .markup-lock-error.show{ display:block; }
+  .markup-shake{ animation:shake .4s; }
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    20%,60%{transform:translateX(-6px);}
+    40%,80%{transform:translateX(6px);}
+  }
+  .markup-lock-hint{
+    margin-top:16px; text-align:center;
+    font-size:11.5px; color:#556; letter-spacing:0.05em;
+  }
+
+  .about-body{ background:#0d0d22; border:1px solid var(--border); border-radius:8px; padding:20px 24px; line-height:1.75; color:var(--text); font-size:13.5px; }
+  .about-body h2{ font-family:"Orbitron",monospace; font-size:16px; letter-spacing:.10em; color:var(--cyan); text-shadow:0 0 10px rgba(0,240,255,.6); margin:0 0 4px; }
+  .about-body h3{ font-size:12.5px; letter-spacing:.14em; color:var(--magenta); margin:22px 0 8px; text-transform:uppercase; }
+  .about-body .rule{ color:#2a2a5a; letter-spacing:1px; margin:6px 0 14px; }
+  .about-body b.dev{ color:var(--cyan); font-weight:800; }
+  .about-body b.email{ color:var(--amber); }
+  .about-body ol{ padding-left:22px; margin:6px 0; }
+  .about-body li{ margin-bottom:6px; }
+  .about-body .note{
+    margin-top:18px; padding:12px 14px; border-left:3px solid var(--magenta);
+    background:rgba(255,0,255,.06); border-radius:0 6px 6px 0; color:#d8b8f0; font-size:12.5px;
+  }
+  .disclaimer{
+    margin-top:18px; background:rgba(20,10,10,0.7); border:1px solid #663333;
+    border-radius:8px; padding:14px 18px; color:#cc9999; font-size:12px;
+    line-height:1.65; position:relative;
+  }
+  .disclaimer .panel-title{ background:var(--bg); color:#ff8866; text-shadow:0 0 8px rgba(255,136,102,.7); }
+  ::-webkit-scrollbar{ width:11px; height:11px; }
+  ::-webkit-scrollbar-track{ background:#0a0a1a; }
+  ::-webkit-scrollbar-thumb{ background:#2a2a5a; border-radius:6px; }
+  ::-webkit-scrollbar-thumb:hover{ background:#3a3a7a; }
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(5,5,15,0.78);
+    backdrop-filter:blur(4px);
+    -webkit-backdrop-filter:blur(4px);
+    display:none; align-items:center; justify-content:center;
+    z-index:99999; padding:20px;
+  }
+  .modal-overlay.show{ display:flex; animation:modalFade .18s ease; }
+  @keyframes modalFade{ from{opacity:0;} to{opacity:1;} }
+  .modal-box{
+    background:linear-gradient(135deg, #0d0d22 0%, #15152a 100%);
+    border:1px solid var(--magenta); border-radius:12px;
+    padding:26px 30px 22px; width:100%; max-width:480px;
+    position:relative;
+    box-shadow:
+      0 0 32px rgba(255,0,255,0.35),
+      0 0 90px rgba(0,240,255,0.12),
+      inset 0 0 30px rgba(0,240,255,0.04);
+    animation:modalPop .22s cubic-bezier(.2,.9,.3,1.2);
+  }
+  @keyframes modalPop{ from{transform:scale(.94) translateY(8px); opacity:0;} to{transform:none; opacity:1;} }
+  .modal-box h3{
+    font-family:"Orbitron", monospace; font-size:15px; font-weight:900;
+    letter-spacing:0.10em; text-transform:uppercase; color:#eaf6ff;
+    text-shadow:0 0 8px var(--cyan), 0 0 20px rgba(0,240,255,0.5);
+    margin:0 0 14px; padding-bottom:12px; border-bottom:1px solid #2a2a5a;
+  }
+  .modal-box p{ color:#c0c8e0; font-size:13.5px; line-height:1.65; margin:0 0 22px; white-space:pre-wrap; }
+  .modal-actions{ display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap; }
+  .modal-actions button{ font-size:12.5px; padding:9px 20px; min-width:100px; }
+  .modal-actions .btn-cancel{ background:#1a1a3a; border:1px solid #3a3a8a; color:#c0c8e0; }
+  .modal-actions .btn-cancel:hover{ background:#2a2a5a; border-color:#8890b0; }
+  .modal-actions .btn-danger{
+    background:linear-gradient(135deg, #3a0f1a 0%, #5a1a2a 100%);
+    border:1px solid #ff4466; color:#ff8899;
+    text-shadow:0 0 8px rgba(255,68,102,0.5);
+  }
+  .modal-actions .btn-danger:hover{
+    background:linear-gradient(135deg, #4a1520 0%, #6a2030 100%);
+    border-color:#ff6688; color:#fff;
+    box-shadow:0 0 18px rgba(255,68,102,0.55);
+  }
+  .modal-actions .btn-primary{
+    background:linear-gradient(135deg, #003344 0%, #2a1a4a 100%);
+    border:1px solid var(--cyan); color:var(--cyan);
+    text-shadow:0 0 8px rgba(0,240,255,0.6);
+  }
+  .modal-actions .btn-primary:hover{
+    background:linear-gradient(135deg, #004455 0%, #3a2a5a 100%);
+    border-color:#fff; color:#fff;
+    box-shadow:0 0 18px rgba(0,240,255,0.55);
+  }
+  .modal-actions .btn-warning{
+    background:linear-gradient(135deg, #3a2a08 0%, #5a3e10 100%);
+    border:1px solid #ffaa00; color:#ffcc66;
+    text-shadow:0 0 8px rgba(255,170,0,0.6);
+  }
+  .modal-actions .btn-warning:hover{
+    background:linear-gradient(135deg, #4a3610 0%, #6a4a15 100%);
+    border-color:#ffcc00; color:#fff;
+    box-shadow:0 0 18px rgba(255,170,0,0.55);
+  }
+</style>
+</head>
+<body>
+
+<div id="mainApp">
+
+  <div class="topbar">
+    <h1>⚡ ACCUMULATOR AUTOTRADER ⚡</h1>
+    <span class="byline">CYBERPUNK EDITION · BY KENNETH</span>
+  </div>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="trading">⚡ Trading</button>
+    <button class="tab" data-tab="markup">💰 Markup</button>
+    <button class="tab" data-tab="about">ℹ️ About</button>
+  </nav>
+
+  <section id="tab-trading" class="tab-panel active">
+
+    <div class="row">
+      <div class="panel cyan grow">
+        <div class="panel-title">🔐 AUTH</div>
+        <div class="auth-inner">
+          <select id="authMethod" aria-hidden="true" tabindex="-1">
+            <option value="none">Choose</option>
+            <option value="pat">PAT Token</option>
+            <option value="oauth">Deriv OAuth</option>
+          </select>
+
+          <div id="authChoicePanel" class="auth-choice-panel">
+            <button id="patChoiceBtn" class="btn-pat-choice">🔑 LOGIN USING PAT TOKEN</button>
+            <button id="oauthChoiceBtn" class="btn-oauth">🔐 SIGN IN WITH DERIV</button>
+          </div>
+
+          <div id="patAuthPanel" class="auth-line auth-mode-panel">
+            <button id="backAuthBtn" class="btn-back-auth" type="button">← BACK</button>
+            <label for="patInput">PAT:</label>
+            <input id="patInput" type="password" name="accutrader_pat_new" placeholder="pat_..." autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" readonly>
+            <button id="showTokenBtn" class="btn-tiny" title="Toggle visibility">👁</button>
+            <button id="connectBtn" class="btn-connect">CONNECT</button>
+          </div>
+
+          <div id="oauthAuthPanel" class="auth-line auth-mode-panel">
+            <button id="backOAuthBtn" class="btn-back-auth" type="button">← BACK</button>
+            <div class="oauth-info">
+              Your email and password are entered securely on Deriv's official login page.
+              AccuTrader does not receive or store your Deriv password.
+            </div>
+            <button id="oauthLoginBtn" class="btn-oauth">🔐 SIGN IN WITH DERIV</button>
+          </div>
+
+          <div class="auth-line">
+            <button id="disconnectBtn" class="btn-disconnect" disabled>DISCONNECT</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-frame">
+        <span id="statusLed" class="led"></span>
+        <span id="statusLabel" class="offline">OFFLINE</span>
+      </div>
+    </div>
+
+    <div class="info-row">
+      <span id="balanceLabel" class="lbl-balance">💰 BAL: --</span>
+      <span id="priceLabel" class="lbl-price">📈 PRICE: --</span>
+      <span id="digitLabel" class="lbl-digit">🔢 LAST DIGIT: --</span>
+      <span class="spacer"></span>
+      <label for="indexCombo">Index:</label>
+      <select id="indexCombo"></select>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">⚙️ ACCUMULATOR PARAMETERS</div>
+      <div class="form-grid">
+        <label for="stakeSpin">Stake:</label>
+        <div class="field-row">
+          <input id="stakeSpin" type="number" min="1" max="10000" step="1" value="10" style="width:130px">
+          <span class="unit">USD</span>
+        </div>
+
+        <label for="tpTypeCombo">Take Profit:</label>
+        <div class="field-row">
+          <select id="tpTypeCombo" style="width:150px">
+            <option value="amount">Amount ($)</option>
+            <option value="ticks">Ticks</option>
+          </select>
+          <input id="tpAmountSpin" type="number" min="0.01" max="100000" step="0.01" value="0.01" style="width:120px">
+          <input id="tpTicksSpin" type="number" min="1" max="1000" step="1" value="3" style="width:110px; display:none">
+          <span class="unit" id="tpUnitHint"></span>
+        </div>
+
+        <label for="growthRateCombo">Growth Rate:</label>
+        <div class="field-row">
+          <select id="growthRateCombo" style="width:150px">
+            <option value="0.01">1%</option>
+            <option value="0.02" selected>2%</option>
+            <option value="0.03">3%</option>
+            <option value="0.04">4%</option>
+            <option value="0.05">5%</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">🤖 AUTO-TRADE ENGINE</div>
+      <div class="engine-row">
+        <label for="tickModeCombo">Tick mode:</label>
+        <select id="tickModeCombo" style="width:180px">
+          <option value="fixed" selected>Fixed interval</option>
+          <option value="random">Random ticks (1, 3, 5, 7, 9)</option>
+        </select>
+        <label for="intervalSpin" id="intervalLabel">Trade every:</label>
+        <input id="intervalSpin" type="number" min="1" max="1000" step="1" value="3" style="width:100px">
+        <span class="unit" id="intervalUnit">ticks</span>
+        <button id="autoTradeBtn" disabled>OFF</button>
+        <button id="manualTradeBtn" class="btn-manual" disabled>⚡ MANUAL TRADE</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">📡 LIVE LOG <span style="color:#3a3a6a; font-weight:400; text-transform:none; letter-spacing:0;">(Ctrl+Shift+D toggles debug)</span></div>
+      <div id="logBox" class="log-box"></div>
+    </div>
+
+    <div class="bottom-row">
+      <div class="panel" style="margin-top:14px">
+        <div class="panel-title">📊 TRADE HISTORY (LAST 8)</div>
+        <table>
+          <thead>
+            <tr><th>Time</th><th>Price</th><th>P/L</th><th>Status</th></tr>
+          </thead>
+          <tbody id="historyBody">
+            <tr><td colspan="4" style="text-align:center;color:#556;padding:22px">No trades yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel" style="margin-top:14px">
+        <div class="panel-title">📈 CONTRACT STATS</div>
+        <div class="stats-inner">
+          <div id="statsWon" class="stat-won">🏆 Won: 0</div>
+          <div id="statsLost" class="stat-lost">💀 Lost: 0</div>
+          <div id="statsTotalPl" class="stat-pl" style="color:var(--cyan)">💰 Total P/L: $0.00</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-markup" class="tab-panel">
+
+    <div id="markupLock">
+      <div class="cyber-title">🔒 ADMIN ACCESS REQUIRED</div>
+
+      <div class="panel">
+        <div class="panel-title">🔐 PASSWORD</div>
+        <div class="markup-lock-inner">
+          <p class="markup-lock-text">
+            Enter the admin password to view markup commission statistics.
+          </p>
+          <div class="markup-lock-row">
+            <input id="markupPassword" type="password"
+                   placeholder="••••" autocomplete="off" spellcheck="false"
+                   inputmode="numeric" maxlength="32">
+            <button id="markupTogglePwd" class="btn-tiny" type="button" title="Toggle visibility">👁</button>
+            <button id="markupUnlockBtn" class="btn-refresh" type="button">🔓 UNLOCK</button>
+          </div>
+          <div id="markupLockError" class="markup-lock-error"></div>
+          <div class="markup-lock-hint">
+            Session-only · re-lock at any time
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="markupUnlocked" style="display:none">
+      <div class="cyber-title">💸 MARKUP COMMISSION STATISTICS</div>
+
+      <div class="panel">
+        <div class="panel-title">📅 THIS MONTH</div>
+        <div class="markup-app-picker">
+          <label for="markupAppIdSelect">📊 APP</label>
+          <select id="markupAppIdSelect">
+            <option value="34EcACZ8mm5javRC4tauK">Web App — OAuth 2.0</option>
+            <option value="33yWXtr1ROjZynlte2ojP">Software App — PAT Token</option>
+          </select>
+          <span id="markupAppIdBadge" class="markup-app-badge">34EcACZ8mm5javRC4tauK</span>
+        </div>
+        <div class="markup-grid">
+          <div class="markup-card"><div class="k">Total Trades</div><div class="v" id="mTotalTrades">--</div></div>
+          <div class="markup-card"><div class="k">Active Clients</div><div class="v" id="mActiveClients">--</div></div>
+          <div class="markup-card hi"><div class="k">Markup Commission</div><div class="v" id="mCommission">--</div></div>
+          <div class="markup-card"><div class="k">Total Volume</div><div class="v" id="mVolume">--</div></div>
+        </div>
+        <div id="mConnState" class="info">🔗 Select an App ID to view its markup statistics.</div>
+        <div id="mStatus">Click Refresh to load data</div>
+      </div>
+
+      <div class="panel" style="margin-top:22px">
+        <div class="panel-title">🔄 ACTIONS</div>
+        <div class="engine-row">
+          <button id="refreshMarkup" class="btn-refresh">🔄 REFRESH MARKUP</button>
+          <button id="markupRelockBtn" class="btn-lock" type="button">🔒 LOCK</button>
+          <span class="unit" style="color:var(--dim);font-size:12.5px">
+            Uses server-side <b>markup credentials</b> — no trading login required
+          </span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <section id="tab-about" class="tab-panel">
+    <div class="about-body">
+      <h2>⚡ ACCUMULATOR AUTOTRADER ⚡</h2>
+      <div class="rule">===============================================</div>
+
+      <b class="dev">Developer: KENNETH KIPKOECH SIGEI</b><br>
+      <b class="email">Email: kennethsigei036@gmail.com</b>
+
+      <h3>Trading Logic</h3>
+      <p>Connects to Deriv using a Personal Access Token and trades ACCU (accumulator) contracts on Volatility indices.</p>
+
+      <h3>1 · Connection &amp; Subscription</h3>
+      <ul>
+        <li>The <b>App ID</b> is hardcoded into this build and hidden from the UI.</li>
+        <li>You only supply your own <b>PAT token</b> in the AUTH panel.</li>
+        <li>Flow: accounts list → real account → OTP → authenticated WebSocket.</li>
+        <li>Subscribes to real-time ticks and balance updates.</li>
+        <li>Ticks are filtered by symbol and subscription ID, so only the currently selected index drives the price display.</li>
+        <li>If Deriv reports that we're <i>already subscribed</i> to a symbol, that response is treated as benign — ticks are already flowing.</li>
+      </ul>
+
+      <h3>2 · Auto-Trade Cycle</h3>
+      <ul>
+        <li>Auto-trade fires a trade every N ticks (user-set) and continues running until you toggle it OFF.</li>
+        <li>After each trade settles (sold, expired, won, or lost), the cycle resets and the tick counter starts fresh for the next trade.</li>
+        <li>The log shows the live market price on every tick.</li>
+      </ul>
+
+      <h3>3 · Balance Guard</h3>
+      <ul>
+        <li>Balance must be at least <b>$1.00 USD</b> (<code>MIN_BALANCE_USD</code>).</li>
+        <li>Stake must not exceed the current balance.</li>
+        <li>If either fails, an alert pop-up appears and the tick counter does <b>not</b> start.</li>
+      </ul>
+
+      <h3>4 · Contract Stats</h3>
+      <ul>
+        <li>Wins, losses and total P/L update after every settled contract.</li>
+        <li>Settlement is detected when Deriv marks the contract as <code>is_sold: 1</code>, <code>is_expired: 1</code>, or reports a terminal status (<code>sold</code>, <code>won</code>, <code>lost</code>, <code>expired</code>).</li>
+      </ul>
+
+      <h3>5 · Markup Statistics (Admin-Protected)</h3>
+      <ul>
+        <li>The Markup tab requires an <b>admin password</b> before showing commission statistics.</li>
+        <li>Once unlocked, the session stays unlocked until you press <b>🔒 LOCK</b> or reload the page.</li>
+        <li><b>No trading login required</b> — the tab uses server-side markup credentials; the PAT is never shipped to the browser.</li>
+        <li>Date range = 1st of current month → today, computed in local time.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="disclaimer">
+    <div class="panel-title">⚠️ RISK DISCLAIMER</div>
+    Deriv offers complex derivatives, such as options and contracts for difference ("CFDs").
+    These products may not be suitable for all clients, and trading them puts you at risk.
+    Please make sure that you understand the following risks before trading Deriv products:
+    a) you may lose some or all of the money you invest in the trade,
+    b) if your trade involves currency conversion, exchange rates will affect your profit and loss.
+    You should never trade with borrowed money or with money that you cannot afford to lose.
+  </div>
+
+</div>
+
+<div id="modalOverlay" class="modal-overlay" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <h3 id="modalTitle">Confirm</h3>
+    <p id="modalMessage">Are you sure?</p>
+    <div class="modal-actions">
+      <button id="modalCancel" class="btn-cancel" type="button">Cancel</button>
+      <button id="modalConfirm" class="btn-danger" type="button">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   HARDCODED CONFIGURATION
+   ===================================================================== */
+const HARDCODED_APP_ID  = "33yWXtr1ROjZynlte2ojP";
+// Dedicated Deriv OAuth App ID and fixed callback for Credentials login.
+const OAUTH_APP_ID       = "34EcACZ8mm5javRC4tauK";
+const OAUTH_REDIRECT_URI = "https://www.kendbot.xyz/callback";
+const MARKUP_APP_IDS = Object.freeze({
+  web: { id: "34EcACZ8mm5javRC4tauK", label: "Web App — OAuth 2.0" },
+  software: { id: "33yWXtr1ROjZynlte2ojP", label: "Software App — PAT Token" }
+});
+const MARKUP_DEFAULT_APP_ID = MARKUP_APP_IDS.web.id;
+const MIN_BALANCE_USD   = 1;
+
+const SUPPORTED_INDICES = {
+  "Volatility 10":       "R_10",
+  "Volatility 25":       "R_25",
+  "Volatility 50":       "R_50",
+  "Volatility 75":       "R_75",
+  "Volatility 100":      "R_100",
+  "Volatility 10 (1s)":  "1HZ10V",
+  "Volatility 25 (1s)":  "1HZ25V",
+  "Volatility 50 (1s)":  "1HZ50V",
+  "Volatility 75 (1s)":  "1HZ75V",
+  "Volatility 100 (1s)": "1HZ100V"
+};
+
+const DEFAULT_SYMBOL   = "R_100";
+const MAX_HISTORY_ROWS = 8;
+const MAX_LOG_LINES    = 400;
+const KEEPALIVE_MS     = 20000;
+const RECONNECT_DELAY_MS = 3000;
+
+const PAT_STORAGE_KEY = "accumulator_trader_pat";
+
+/* =====================================================================
+   HELPERS
+   ===================================================================== */
+function getDecimalPlaces(symbol){
+  if (symbol.startsWith("1HZ")) return 2;
+  if (symbol === "R_10" || symbol === "R_25") return 3;
+  if (symbol === "R_50" || symbol === "R_75") return 4;
+  return 2;
+}
+function lastDigitFromPrice(price, symbol){
+  const dp = getDecimalPlaces(symbol);
+  const formatted = price.toFixed(dp);
+  return parseInt(formatted[formatted.length - 1], 10);
+}
+function fmtSigned(v){ return (v >= 0 ? "+" : "") + v.toFixed(2); }
+
+function sanitizeToken(raw){
+  return String(raw || "")
+    .replace(/[\u200B-\u200D\uFEFF\u00A0]/g, "")
+    .replace(/\s+/g, "")
+    .trim();
+}
+
+function fmtHeaders(h){
+  return Object.entries(h).map(([k,v]) => {
+    if (k.toLowerCase() === "authorization"){
+      const t = String(v);
+      return `${k}: ${t.slice(0, 20)}…${t.slice(-6)}`;
+    }
+    return `${k}: ${v}`;
+  }).join("\n    ");
+}
+
+function localDateYMD(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+/* =====================================================================
+   STATE
+   ===================================================================== */
+const state = {
+  connected: false,
+  disconnecting: false,
+  ws: null,
+  keepAliveTimer: null,
+  tickWatchdogTimer: null,
+  lastTickAt: 0,
+  reconnectTimer: null,
+  reconnecting: false,
+  reqCounter: 100,
+  pendingRequests: {},
+
+  appId: HARDCODED_APP_ID,
+  connectedAppId: null,
+  authMethod: "none",
+  patToken: "",
+  oauthAuthInfo: null,
+  oauthRefreshing: false,
+
+  accountId: null,
+  balance: 0,
+  accountBalance: 0,
+  activeTradeInitialBalance: null,
+  currency: "USD",
+  symbol: DEFAULT_SYMBOL,
+  price: 0,
+  lastDigit: null,
+  tickCounter: 0,
+  tickSubscriptionId: null,
+
+  autoTrade: false,
+  autoTradeTickTarget: 3,
+  tradingCycleActive: false,
+  pendingProposal: false,
+  contractId: null,
+  contractSubscriptionId: null,
+  activeStake: null,
+  entryPrice: null,
+  tpTicksActive: false,
+  tpTicksTarget: 0,
+  tpTicksElapsed: 0,
+
+  tradesWon: 0,
+  tradesLost: 0,
+  totalPL: 0,
+  history: [],
+
+  markupUnlocked: false,
+  markupAppId: MARKUP_DEFAULT_APP_ID
+};
+
+let DEBUG = false;
+
+/* =====================================================================
+   DOM REFS
+   ===================================================================== */
+const $ = (id) => document.getElementById(id);
+
+const authMethod     = $("authMethod");
+const authChoicePanel = $("authChoicePanel");
+const patChoiceBtn    = $("patChoiceBtn");
+const oauthChoiceBtn  = $("oauthChoiceBtn");
+const backAuthBtn     = $("backAuthBtn");
+const backOAuthBtn    = $("backOAuthBtn");
+const patAuthPanel    = $("patAuthPanel");
+const oauthAuthPanel  = $("oauthAuthPanel");
+const patInput        = $("patInput");
+const showTokenBtn    = $("showTokenBtn");
+const connectBtn      = $("connectBtn");
+const oauthLoginBtn   = $("oauthLoginBtn");
+const disconnectBtn   = $("disconnectBtn");
+const statusLed       = $("statusLed");
+const statusLabel     = $("statusLabel");
+const balanceLabel    = $("balanceLabel");
+const priceLabel      = $("priceLabel");
+const digitLabel      = $("digitLabel");
+const indexCombo      = $("indexCombo");
+const stakeSpin       = $("stakeSpin");
+const tpTypeCombo     = $("tpTypeCombo");
+const tpAmountSpin    = $("tpAmountSpin");
+const tpTicksSpin     = $("tpTicksSpin");
+const tickModeCombo   = $("tickModeCombo");
+const intervalLabel   = $("intervalLabel");
+const intervalUnit    = $("intervalUnit");
+const tpUnitHint      = $("tpUnitHint");
+const growthRateCombo = $("growthRateCombo");
+const intervalSpin    = $("intervalSpin");
+const autoTradeBtn    = $("autoTradeBtn");
+const manualTradeBtn  = $("manualTradeBtn");
+const logBox          = $("logBox");
+const historyBody     = $("historyBody");
+const statsWon        = $("statsWon");
+const statsLost       = $("statsLost");
+const statsTotalPl    = $("statsTotalPl");
+const mConnState      = $("mConnState");
+
+const markupLock        = $("markupLock");
+const markupUnlockedDiv = $("markupUnlocked");
+const markupPassword    = $("markupPassword");
+const markupTogglePwd   = $("markupTogglePwd");
+const markupUnlockBtn   = $("markupUnlockBtn");
+const markupLockError   = $("markupLockError");
+const markupRelockBtn   = $("markupRelockBtn");
+const markupAppIdSelect = $("markupAppIdSelect");
+const markupAppIdBadge  = $("markupAppIdBadge");
+
+const modalOverlay  = $("modalOverlay");
+const modalTitle    = $("modalTitle");
+const modalMessage  = $("modalMessage");
+const modalCancel   = $("modalCancel");
+const modalConfirm  = $("modalConfirm");
+
+/* =====================================================================
+   CUSTOM MODAL
+   ===================================================================== */
+function showConfirm(title, message, options = {}){
+  const confirmText = options.confirmText || "Confirm";
+  const cancelText  = options.cancelText  || "Cancel";
+  const confirmKind = options.confirmKind || "danger";
+
+  return new Promise((resolve) => {
+    modalTitle.textContent   = title;
+    modalMessage.textContent = message;
+    modalConfirm.textContent = confirmText;
+    modalCancel.textContent  = cancelText;
+    modalConfirm.className   = "btn-" + confirmKind;
+    modalCancel.style.display = "";
+    modalConfirm.style.display = "";
+    modalOverlay.classList.add("show");
+    setTimeout(() => modalConfirm.focus(), 40);
+
+    const cleanup = () => {
+      modalOverlay.classList.remove("show");
+      modalConfirm.removeEventListener("click", onConfirm);
+      modalCancel.removeEventListener("click", onCancel);
+      modalOverlay.removeEventListener("click", onBackdrop);
+      document.removeEventListener("keydown", onKey);
+    };
+    const onConfirm  = () => { cleanup(); resolve(true); };
+    const onCancel   = () => { cleanup(); resolve(false); };
+    const onBackdrop = (e) => { if (e.target === modalOverlay) onCancel(); };
+    const onKey = (e) => {
+      if (e.key === "Escape") onCancel();
+      else if (e.key === "Enter" && document.activeElement === modalConfirm) onConfirm();
+    };
+    modalConfirm.addEventListener("click", onConfirm);
+    modalCancel.addEventListener("click", onCancel);
+    modalOverlay.addEventListener("click", onBackdrop);
+    document.addEventListener("keydown", onKey);
+  });
+}
+
+function showAlert(title, message, options = {}){
+  const confirmText = options.confirmText || "OK";
+  const confirmKind = options.confirmKind || "warning";
+
+  return new Promise((resolve) => {
+    modalTitle.textContent   = title;
+    modalMessage.textContent = message;
+    modalConfirm.textContent = confirmText;
+    modalCancel.textContent  = "";
+    modalConfirm.className   = "btn-" + confirmKind;
+    modalCancel.style.display = "none";
+    modalOverlay.classList.add("show");
+    setTimeout(() => modalConfirm.focus(), 40);
+
+    const cleanup = () => {
+      modalOverlay.classList.remove("show");
+      modalCancel.style.display = "";
+      modalConfirm.removeEventListener("click", onConfirm);
+      modalOverlay.removeEventListener("click", onBackdrop);
+      document.removeEventListener("keydown", onKey);
+    };
+    const onConfirm  = () => { cleanup(); resolve(); };
+    const onBackdrop = (e) => { if (e.target === modalOverlay) onConfirm(); };
+    const onKey = (e) => {
+      if (e.key === "Escape" || e.key === "Enter") onConfirm();
+    };
+    modalConfirm.addEventListener("click", onConfirm);
+    modalOverlay.addEventListener("click", onBackdrop);
+    document.addEventListener("keydown", onKey);
+  });
+}
+
+/* =====================================================================
+   TABS
+   ===================================================================== */
+document.querySelectorAll(".tab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    $("tab-" + btn.dataset.tab).classList.add("active");
+
+    if (btn.dataset.tab === "markup"){
+      updateMarkupVisibility();
+      if (!state.markupUnlocked){
+        setTimeout(() => markupPassword.focus(), 60);
+      }
+    }
+  });
+});
+
+/* =====================================================================
+   LOGGING
+   ===================================================================== */
+function log(msg, isError = false){
+  const now = new Date();
+  const ts = now.toTimeString().slice(0, 8);
+  const line = document.createElement("div");
+  line.className = isError ? "err" : "";
+  line.innerHTML = `<span class="t">[${ts}]</span> ${isError ? "❌" : "ℹ️"} ${escapeHtml(msg)}`;
+  logBox.appendChild(line);
+  while (logBox.childElementCount > MAX_LOG_LINES) logBox.removeChild(logBox.firstChild);
+  logBox.scrollTop = logBox.scrollHeight;
+  console.log(`[AutoTrader] ${msg}`);
+}
+
+function logOk(msg){
+  const now = new Date();
+  const ts = now.toTimeString().slice(0, 8);
+  const line = document.createElement("div");
+  line.className = "ok";
+  line.innerHTML = `<span class="t">[${ts}]</span> ✅ ${escapeHtml(msg)}`;
+  logBox.appendChild(line);
+  while (logBox.childElementCount > MAX_LOG_LINES) logBox.removeChild(logBox.firstChild);
+  logBox.scrollTop = logBox.scrollHeight;
+  console.log(`[AutoTrader OK] ${msg}`);
+}
+
+function dbg(msg){
+  if (!DEBUG) return;
+  const now = new Date();
+  const ts = now.toTimeString().slice(0, 8);
+  const line = document.createElement("div");
+  line.className = "dbg";
+  line.innerHTML = `<span class="t">[${ts}]</span> 🔍 ${escapeHtml(msg)}`;
+  logBox.appendChild(line);
+  while (logBox.childElementCount > MAX_LOG_LINES) logBox.removeChild(logBox.firstChild);
+  logBox.scrollTop = logBox.scrollHeight;
+}
+
+function escapeHtml(s){
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.ctrlKey && e.shiftKey && (e.key === "D" || e.key === "d")){
+    e.preventDefault();
+    DEBUG = !DEBUG;
+    log(`Debug mode ${DEBUG ? "ON" : "OFF"}`);
+  }
+});
+
+function clearPatInput(){
+  // OAuth must never populate or retain the PAT credential field.
+  patInput.value = "";
+  state.patToken = "";
+}
+
+function armPatInput(){
+  // Keep password managers from treating this as an existing account
+  // password. The field becomes editable only when the user explicitly
+  // focuses it while PAT authentication is selected.
+  patInput.readOnly = false;
+}
+
+patInput.addEventListener("focus", armPatInput);
+patInput.addEventListener("input", () => {
+  if (authMethod.value !== "pat") clearPatInput();
+});
+
+showTokenBtn.addEventListener("click", () => {
+  armPatInput();
+  patInput.type = patInput.type === "password" ? "text" : "password";
+});
+
+/* =====================================================================
+   MARKUP PASSWORD GATE
+   ===================================================================== */
+function updateMarkupVisibility(){
+  if (state.markupUnlocked){
+    markupLock.style.display = "none";
+    markupUnlockedDiv.style.display = "";
+  } else {
+    markupLock.style.display = "";
+    markupUnlockedDiv.style.display = "none";
+  }
+}
+
+let markupAdminPassword = "";
+
+async function attemptMarkupUnlock(){
+  const entered = markupPassword.value;
+  if (!entered){
+    markupLockError.textContent = "❌ Enter the admin password.";
+    markupLockError.classList.add("show");
+    return;
+  }
+
+  markupUnlockBtn.disabled = true;
+  markupUnlockBtn.textContent = "⏳ CHECKING…";
+
+  try {
+    const resp = await fetch("/api/markup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "validate", password: entered })
+    });
+    const data = await resp.json().catch(() => ({}));
+
+    if (!resp.ok || !data.ok){
+      throw new Error(data.error || "Incorrect password.");
+    }
+
+    markupAdminPassword = entered;
+    state.markupUnlocked = true;
+    markupPassword.value = "";
+    markupLockError.classList.remove("show");
+    markupLockError.textContent = "";
+    updateMarkupVisibility();
+    log("🔓 Markup tab unlocked by admin");
+    console.log("[AutoTrader] Markup unlocked");
+  } catch (err){
+    markupLockError.textContent = "❌ " + (err.message || "Incorrect password.");
+    markupLockError.classList.add("show");
+    markupPassword.value = "";
+
+    const card = markupLock.querySelector(".panel");
+    card.classList.remove("markup-shake");
+    void card.offsetWidth;
+    card.classList.add("markup-shake");
+
+    markupPassword.focus();
+    log("❌ Markup unlock failed — incorrect password", true);
+    console.log("[AutoTrader] Markup unlock failed");
+  } finally {
+    markupUnlockBtn.disabled = false;
+    markupUnlockBtn.textContent = "🔓 UNLOCK";
+  }
+}
+
+markupUnlockBtn.addEventListener("click", attemptMarkupUnlock);
+
+markupPassword.addEventListener("keydown", (e) => {
+  if (e.key === "Enter"){
+    e.preventDefault();
+    attemptMarkupUnlock();
+  }
+});
+
+markupTogglePwd.addEventListener("click", () => {
+  markupPassword.type = markupPassword.type === "password" ? "text" : "password";
+});
+
+markupRelockBtn.addEventListener("click", () => {
+  state.markupUnlocked = false;
+  markupAdminPassword = "";
+  markupPassword.value = "";
+  markupPassword.type = "password";
+  markupLockError.classList.remove("show");
+  markupLockError.textContent = "";
+
+  $("mTotalTrades").textContent   = "--";
+  $("mActiveClients").textContent = "--";
+  $("mCommission").textContent    = "--";
+  $("mVolume").textContent        = "--";
+  $("mStatus").textContent        = "Click Refresh to load data";
+  $("mStatus").style.color        = "#88aaff";
+  markupAppIdSelect.value = MARKUP_DEFAULT_APP_ID;
+  updateMarkupAppSelection();
+
+  updateMarkupVisibility();
+  log("🔒 Markup tab locked");
+  console.log("[AutoTrader] Markup locked");
+});
+
+/* =====================================================================
+   POPULATE INDEX COMBO
+   ===================================================================== */
+(function initIndexCombo(){
+  Object.keys(SUPPORTED_INDICES).forEach(name => {
+    const opt = document.createElement("option");
+    opt.value = SUPPORTED_INDICES[name];
+    opt.textContent = name;
+    indexCombo.appendChild(opt);
+  });
+  indexCombo.value = DEFAULT_SYMBOL;
+})();
+
+/* =====================================================================
+   AUTH SESSION PERSISTENCE
+   Credentials are kept in Secure, SameSite cookies so a normal browser
+   reload does not force the user to authenticate again. OAuth's temporary
+   state/PKCE values remain in sessionStorage and are never persisted here.
+   ===================================================================== */
+const AUTH_PAT_COOKIE = "accutrader_pat";
+const AUTH_OAUTH_COOKIE = "accutrader_oauth_session";
+const AUTH_METHOD_COOKIE = "accutrader_auth_method";
+
+function setAuthCookie(name, value, maxAgeSeconds = 86400){
+  const encoded = encodeURIComponent(String(value ?? ""));
+  document.cookie = `${name}=${encoded}; Max-Age=${maxAgeSeconds}; Path=/; Secure; SameSite=Lax`;
+}
+
+function getAuthCookie(name){
+  const prefix = `${name}=`;
+  const found = document.cookie.split(";").map(v => v.trim()).find(v => v.startsWith(prefix));
+  if (!found) return "";
+  try { return decodeURIComponent(found.slice(prefix.length)); } catch (_) { return ""; }
+}
+
+function deleteAuthCookie(name){
+  document.cookie = `${name}=; Max-Age=0; Path=/; Secure; SameSite=Lax`;
+}
+
+function savePat(pat){
+  const token = sanitizeToken(pat);
+  if (token) setAuthCookie(AUTH_PAT_COOKIE, token, 86400);
+  setAuthCookie(AUTH_METHOD_COOKIE, "pat", 86400);
+}
+
+function loadPat(){
+  return sanitizeToken(getAuthCookie(AUTH_PAT_COOKIE));
+}
+
+function persistOAuthAuthInfo(authInfo){
+  if (!authInfo || !authInfo.access_token) return;
+  try {
+    const payload = btoa(unescape(encodeURIComponent(JSON.stringify(authInfo))));
+    // Keep the session for up to 30 days; the access/refresh token expiry
+    // remains authoritative and is checked before every connection.
+    setAuthCookie(AUTH_OAUTH_COOKIE, payload, 30 * 86400);
+    setAuthCookie(AUTH_METHOD_COOKIE, "oauth", 30 * 86400);
+  } catch (_) {
+    log("⚠️ Unable to persist the OAuth browser session.", true);
+  }
+}
+
+function loadPersistedOAuthAuthInfo(){
+  const encoded = getAuthCookie(AUTH_OAUTH_COOKIE);
+  if (!encoded) return null;
+  try {
+    return JSON.parse(decodeURIComponent(escape(atob(encoded))));
+  } catch (_) {
+    deleteAuthCookie(AUTH_OAUTH_COOKIE);
+    return null;
+  }
+}
+
+function clearPersistedAuth(){
+  deleteAuthCookie(AUTH_PAT_COOKIE);
+  deleteAuthCookie(AUTH_OAUTH_COOKIE);
+  deleteAuthCookie(AUTH_METHOD_COOKIE);
+}
+
+function clearPersistedPat(){
+  deleteAuthCookie(AUTH_PAT_COOKIE);
+  if (getAuthCookie(AUTH_METHOD_COOKIE) === "pat") deleteAuthCookie(AUTH_METHOD_COOKIE);
+}
+
+/* =====================================================================
+   DERIV OAUTH 2.0 / PKCE AUTHENTICATION
+   Credentials are entered on Deriv's hosted login page; this app never
+   receives the user's Deriv password.
+
+   IMPORTANT: OAuth state + PKCE verifier are stored in sessionStorage.
+   The callback is deliberately forced onto the exact registered origin
+   (www.kendbot.live), so the transaction remains same-origin.
+   ===================================================================== */
+const OAUTH_AUTH_BASE = "https://auth.deriv.com/oauth2";
+const OAUTH_SCOPE = "trade";
+const OAUTH_CSRF_KEY = "accutrader_oauth_csrf";
+const OAUTH_VERIFIER_KEY = "accutrader_oauth_verifier";
+const OAUTH_STARTED_KEY = "accutrader_oauth_started";
+const OAUTH_MAX_AGE_MS = 10 * 60 * 1000;
+const OAUTH_CANONICAL_ORIGIN = "https://www.kendbot.live";
+
+function randomBase64Url(byteLength = 32){
+  const bytes = new Uint8Array(byteLength);
+  crypto.getRandomValues(bytes);
+  let binary = "";
+  for (const b of bytes) binary += String.fromCharCode(b);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+async function sha256Base64Url(value){
+  const data = new TextEncoder().encode(value);
+  const hash = await crypto.subtle.digest("SHA-256", data);
+  let binary = "";
+  for (const b of new Uint8Array(hash)) binary += String.fromCharCode(b);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function oauthSessionStorage(){
+  try { return window.sessionStorage; }
+  catch (_) { throw new Error("Unable to access this browser's temporary OAuth session storage."); }
+}
+
+function storeOAuthTransient(key, value){
+  try {
+    const payload = JSON.stringify({ value, createdAt: Date.now() });
+    oauthSessionStorage().setItem(key, payload);
+    const stored = oauthSessionStorage().getItem(key);
+    if (!stored) throw new Error("sessionStorage write was not retained");
+  } catch (_) {
+    throw new Error("Unable to store the temporary OAuth login state in this browser.");
+  }
+}
+
+function getOAuthTransient(key){
+  try {
+    const raw = oauthSessionStorage().getItem(key);
+    if (!raw) return null;
+    const stored = JSON.parse(raw);
+    if (!stored || !stored.value || !Number.isFinite(stored.createdAt) ||
+        Date.now() - stored.createdAt > OAUTH_MAX_AGE_MS){
+      oauthSessionStorage().removeItem(key);
+      return null;
+    }
+    return stored.value;
+  } catch (_) {
+    return null;
+  }
+}
+
+function clearOAuthTransient(){
+  try {
+    const storage = oauthSessionStorage();
+    storage.removeItem(OAUTH_CSRF_KEY);
+    storage.removeItem(OAUTH_VERIFIER_KEY);
+    storage.removeItem(OAUTH_STARTED_KEY);
+  } catch (_) {}
+}
+
+function storeOAuthAuthInfo(authInfo){
+  state.oauthAuthInfo = authInfo;
+  persistOAuthAuthInfo(authInfo);
+}
+function getOAuthAuthInfo(){ return state.oauthAuthInfo || loadPersistedOAuthAuthInfo(); }
+function clearOAuthAuthInfo(){
+  state.oauthAuthInfo = null;
+  deleteAuthCookie(AUTH_OAUTH_COOKIE);
+  if (getAuthCookie(AUTH_METHOD_COOKIE) === "oauth") deleteAuthCookie(AUTH_METHOD_COOKIE);
+}
+
+function oauthRedirectUri(){
+  return OAUTH_REDIRECT_URI;
+}
+
+function isCanonicalOAuthOrigin(){
+  return window.location.origin === OAUTH_CANONICAL_ORIGIN;
+}
+
+function canonicalOAuthStartUrl(){
+  return `${OAUTH_CANONICAL_ORIGIN}/?oauth_start=1`;
+}
+
+async function buildOAuthAuthorizationUrl(){
+  if (!isCanonicalOAuthOrigin()){
+    throw new Error("OAuth login must be started from https://www.kendbot.live.");
+  }
+
+  const csrfToken = randomBase64Url(32);
+  const codeVerifier = randomBase64Url(32);
+  const codeChallenge = await sha256Base64Url(codeVerifier);
+
+  clearOAuthTransient();
+  storeOAuthTransient(OAUTH_CSRF_KEY, csrfToken);
+  storeOAuthTransient(OAUTH_VERIFIER_KEY, codeVerifier);
+  storeOAuthTransient(OAUTH_STARTED_KEY, "1");
+
+  const params = new URLSearchParams({
+    scope: OAUTH_SCOPE,
+    response_type: "code",
+    client_id: OAUTH_APP_ID,
+    redirect_uri: oauthRedirectUri(),
+    state: csrfToken,
+    code_challenge: codeChallenge,
+    code_challenge_method: "S256"
+  });
+
+  return `${OAUTH_AUTH_BASE}/auth?${params.toString()}`;
+}
+
+async function startOAuthLogin(){
+  if (state.connected) return;
+  clearPatInput();
+
+  // Never start the OAuth transaction on the apex/Vercel origin. The
+  // registered callback is www.kendbot.live, and sessionStorage is
+  // origin-scoped.
+  if (!isCanonicalOAuthOrigin()){
+    window.location.replace(canonicalOAuthStartUrl());
+    return;
+  }
+
+  oauthLoginBtn.disabled = true;
+  oauthLoginBtn.textContent = "REDIRECTING…";
+  try {
+    const url = await buildOAuthAuthorizationUrl();
+    log("Opening Deriv OAuth 2.0 login…");
+    window.location.href = url;
+  } catch (err){
+    oauthLoginBtn.disabled = false;
+    oauthLoginBtn.textContent = "🔐 SIGN IN WITH DERIV";
+    throw err;
+  }
+}
+
+async function exchangeOAuthCode(code, codeVerifier){
+  const body = new URLSearchParams({
+    grant_type: "authorization_code",
+    code,
+    client_id: OAUTH_APP_ID,
+    redirect_uri: oauthRedirectUri(),
+    code_verifier: codeVerifier
+  });
+
+  const response = await fetch(`${OAUTH_AUTH_BASE}/token`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString()
+  });
+
+  if (!response.ok){
+    const errorBody = await response.text();
+    throw new Error(`OAuth token exchange failed (HTTP ${response.status}): ${errorBody.slice(0, 300)}`);
+  }
+
+  const tokenData = await response.json();
+  if (!tokenData.access_token) throw new Error("OAuth response did not contain an access token.");
+
+  const authInfo = {
+    access_token: tokenData.access_token,
+    token_type: tokenData.token_type || "Bearer",
+    expires_in: tokenData.expires_in || 0,
+    expires_at: tokenData.expires_at || (Math.floor(Date.now() / 1000) + (tokenData.expires_in || 0)),
+    scope: tokenData.scope || OAUTH_SCOPE,
+    refresh_token: tokenData.refresh_token || ""
+  };
+
+  storeOAuthAuthInfo(authInfo);
+  return authInfo;
+}
+
+async function refreshOAuthAccessToken(refreshToken){
+  if (!refreshToken) throw new Error("No OAuth refresh token is available.");
+
+  const body = new URLSearchParams({
+    grant_type: "refresh_token",
+    refresh_token: refreshToken,
+    client_id: OAUTH_APP_ID
+  });
+
+  const response = await fetch(`${OAUTH_AUTH_BASE}/token`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString()
+  });
+
+  if (!response.ok){
+    clearOAuthAuthInfo();
+    throw new Error(`OAuth token refresh failed (HTTP ${response.status}).`);
+  }
+
+  const tokenData = await response.json();
+  if (!tokenData.access_token) throw new Error("OAuth refresh response did not contain an access token.");
+
+  const authInfo = {
+    access_token: tokenData.access_token,
+    token_type: tokenData.token_type || "Bearer",
+    expires_in: tokenData.expires_in || 0,
+    expires_at: tokenData.expires_at || (Math.floor(Date.now() / 1000) + (tokenData.expires_in || 0)),
+    scope: tokenData.scope || OAUTH_SCOPE,
+    refresh_token: tokenData.refresh_token || refreshToken
+  };
+
+  storeOAuthAuthInfo(authInfo);
+  return authInfo;
+}
+
+async function getUsableOAuthAuthInfo(){
+  let authInfo = state.oauthAuthInfo || getOAuthAuthInfo();
+  if (!authInfo) return null;
+
+  const expiresAt = Number(authInfo.expires_at || 0);
+  if (expiresAt && Date.now() / 1000 >= expiresAt - 60){
+    if (state.oauthRefreshing) return authInfo;
+    state.oauthRefreshing = true;
+    try {
+      authInfo = await refreshOAuthAccessToken(authInfo.refresh_token);
+    } finally {
+      state.oauthRefreshing = false;
+    }
+  }
+
+  state.oauthAuthInfo = authInfo;
+  return authInfo;
+}
+
+function cleanOAuthCallbackUrl(){
+  const url = new URL(window.location.href);
+  ["code","state","scope","error","error_description","oauth_start"].forEach(p => url.searchParams.delete(p));
+  window.history.replaceState(window.history.state, "", url.pathname + url.search);
+}
+
+async function handleOAuthCallback(){
+  const url = new URL(window.location.href);
+  const code = url.searchParams.get("code");
+  const stateParam = url.searchParams.get("state");
+  const oauthError = url.searchParams.get("error");
+  const oauthStart = url.searchParams.get("oauth_start");
+
+  if (!code && !oauthError && oauthStart === "1") return "start";
+  if (!code && !oauthError) return false;
+
+  if (!isCanonicalOAuthOrigin()){
+    cleanOAuthCallbackUrl();
+    clearOAuthTransient();
+    clearOAuthAuthInfo();
+    throw new Error("OAuth callback arrived on an unexpected browser origin. Please start Sign In with Deriv again.");
+  }
+
+  if (oauthError){
+    const description = url.searchParams.get("error_description") || oauthError;
+    cleanOAuthCallbackUrl();
+    clearOAuthTransient();
+    throw new Error(`Deriv OAuth login failed: ${description}`);
+  }
+
+  const storedState = getOAuthTransient(OAUTH_CSRF_KEY);
+  if (!stateParam || !storedState || stateParam !== storedState){
+    cleanOAuthCallbackUrl();
+    clearOAuthTransient();
+    clearOAuthAuthInfo();
+    throw new Error("OAuth state validation failed — the login session expired or was opened in a different browser tab. Please click Sign In with Deriv again.");
+  }
+
+  const codeVerifier = getOAuthTransient(OAUTH_VERIFIER_KEY);
+  if (!codeVerifier){
+    cleanOAuthCallbackUrl();
+    clearOAuthTransient();
+    throw new Error("OAuth PKCE code verifier is missing or expired. Please click Sign In with Deriv again.");
+  }
+
+  try {
+    log("OAuth callback received — exchanging authorization code…");
+    const authInfo = await exchangeOAuthCode(code, codeVerifier);
+    cleanOAuthCallbackUrl();
+    clearOAuthTransient();
+    return authInfo;
+  } catch (err){
+    cleanOAuthCallbackUrl();
+    clearOAuthTransient();
+    clearOAuthAuthInfo();
+    throw err;
+  }
+}
+
+/**
+ * Fetch the Deriv trading accounts associated with an OAuth access token.
+ * This mirrors the accounts helper from accumulators-app.
+ */
+async function fetchAccounts(appId, accessToken){
+  const response = await fetch("https://api.derivws.com/trading/v1/options/accounts", {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${accessToken}`,
+      "Deriv-App-ID": appId
+    }
+  });
+
+  if (!response.ok){
+    const body = await response.text().catch(() => "");
+    throw new Error(`Failed to fetch accounts (HTTP ${response.status})${body ? `: ${body.slice(0, 250)}` : ""}`);
+  }
+
+  const data = await response.json();
+  const accounts = Array.isArray(data?.data) ? data.data : [];
+  if (!accounts.length && data?.data && !Array.isArray(data.data)){
+    throw new Error("Deriv accounts response had an unexpected format.");
+  }
+  return accounts;
+}
+
+/**
+ * Request a one-time authenticated WebSocket URL for a Deriv account.
+ * This mirrors getWebSocketOTP() from accumulators-app.
+ */
+async function fetchOtpUrl(appId, accessToken, accountId){
+  const response = await fetch(`https://api.derivws.com/trading/v1/options/accounts/${encodeURIComponent(accountId)}/otp`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${accessToken}`,
+      "Deriv-App-ID": appId
+    }
+  });
+
+  if (!response.ok){
+    const body = await response.text().catch(() => "");
+    throw new Error(`Failed to get WebSocket OTP (HTTP ${response.status})${body ? `: ${body.slice(0, 250)}` : ""}`);
+  }
+
+  const data = await response.json();
+  const wsUrl = data?.data?.url;
+  if (!wsUrl) throw new Error("Deriv OTP response did not contain a WebSocket URL.");
+  return wsUrl;
+}
+
+async function connectWithOAuthAuth(authInfo){
+  if (!authInfo || !authInfo.access_token) throw new Error("No OAuth access token available.");
+
+  const appId = OAUTH_APP_ID;
+  state.appId = appId;
+  state.patToken = "";
+
+  log("Step 1/3 — fetching Deriv accounts using OAuth access token…");
+  const accounts = await fetchAccounts(appId, authInfo.access_token);
+  log(`   ↳ ${accounts.length} account(s) returned`);
+
+  state.connectedAppId = appId;
+  const realAcc = accounts.find(a => a.account_type === "real")
+               || accounts.find(a => a.account_type !== "virtual");
+  if (!realAcc) throw new Error("No real account found for this Deriv login.");
+
+  state.accountId = realAcc.account_id;
+  state.balance = parseFloat(realAcc.balance || "0");
+  state.currency = realAcc.currency || "USD";
+  updateBalanceUI();
+  log(`   ↳ using ${state.accountId} · ${state.balance.toFixed(2)} ${state.currency}`);
+
+  log("Step 2/3 — requesting OTP WebSocket URL…");
+  const wsUrl = await fetchOtpUrl(appId, authInfo.access_token, state.accountId);
+  log("   ↳ OTP acquired");
+
+  log("Step 3/3 — opening authenticated WebSocket…");
+  state.ws = new WebSocket(wsUrl);
+  state.ws.onopen = onWsOpen;
+  state.ws.onmessage = onWsMessage;
+  state.ws.onerror = onWsError;
+  state.ws.onclose = onWsClose;
+}
+
+async function completeOAuthLogin(authInfo){
+  state.authMethod = "oauth";
+  authMethod.value = "oauth";
+  updateAuthMethodUI();
+
+  try {
+    await connectWithOAuthAuth(authInfo);
+  } catch (err){
+    // A stale access token can be recovered once with the refresh token.
+    if (authInfo.refresh_token){
+      log("OAuth access token was rejected; attempting token refresh…");
+      const refreshed = await refreshOAuthAccessToken(authInfo.refresh_token);
+      await connectWithOAuthAuth(refreshed);
+    } else {
+      throw err;
+    }
+  }
+}
+
+async function restoreOAuthSession(){
+  try {
+    const callbackAuth = await handleOAuthCallback();
+    if (callbackAuth === "start") return "start";
+    if (callbackAuth){
+      await completeOAuthLogin(callbackAuth);
+      return true;
+    }
+
+    // A normal page reload should reuse the previous OAuth session. The
+    // access token is refreshed automatically when it is near expiry.
+    const persisted = loadPersistedOAuthAuthInfo();
+    if (persisted && persisted.access_token){
+      state.oauthAuthInfo = persisted;
+      await completeOAuthLogin(persisted);
+      return true;
+    }
+    return false;
+  } catch (err){
+    clearOAuthAuthInfo();
+    clearOAuthTransient();
+    cleanOAuthCallbackUrl();
+    setOnline(false);
+    authMethod.value = "none";
+    updateAuthMethodUI();
+    clearPatInput();
+    // Some password managers re-apply autofill after navigation/DOMContentLoaded.
+    // Keep the PAT field empty after an OAuth failure as well.
+    setTimeout(clearPatInput, 0);
+    setTimeout(clearPatInput, 250);
+    setTimeout(clearPatInput, 1000);
+    log(`OAuth authentication failed: ${err.message}`, true);
+    return false;
+  }
+}
+
+function updateAuthMethodUI(){
+  const method = authMethod.value;
+  const isPat = method === "pat";
+  const isOAuth = method === "oauth";
+  const isChooser = !isPat && !isOAuth;
+
+  state.authMethod = method;
+  authChoicePanel.style.display = isChooser ? "flex" : "none";
+  patAuthPanel.classList.toggle("active", isPat);
+  oauthAuthPanel.classList.toggle("active", isOAuth);
+
+  if (!isPat) clearPatInput();
+  if (!state.connected){
+    patInput.disabled = !isPat;
+    patInput.readOnly = !isPat;
+    connectBtn.disabled = !isPat;
+    oauthLoginBtn.disabled = !isOAuth;
+    patChoiceBtn.disabled = false;
+    oauthChoiceBtn.disabled = false;
+  }
+}
+
+function chooseAuthMethod(method){
+  if (state.connected) return;
+  authMethod.value = method;
+  updateAuthMethodUI();
+  if (method === "pat") {
+    clearPatInput();
+    setTimeout(() => patInput.focus(), 0);
+    log("Authentication method: PAT Token");
+  } else if (method === "oauth") {
+    clearPatInput();
+    log("Authentication method: Deriv OAuth 2.0");
+  }
+}
+
+function resetAuthChooser(){
+  if (state.connected) return;
+  clearPatInput();
+  authMethod.value = "none";
+  updateAuthMethodUI();
+}
+
+function isPatAuth(){
+  return authMethod.value === "pat";
+}
+
+patChoiceBtn.addEventListener("click", () => chooseAuthMethod("pat"));
+oauthChoiceBtn.addEventListener("click", async () => {
+  chooseAuthMethod("oauth");
+  try {
+    await startOAuthLogin();
+  } catch (err){
+    resetAuthChooser();
+    log(`❌ ${err.message}`, true);
+  }
+});
+backAuthBtn.addEventListener("click", resetAuthChooser);
+backOAuthBtn.addEventListener("click", resetAuthChooser);
+
+oauthLoginBtn.addEventListener("click", async () => {
+  clearPatInput();
+  try {
+    await startOAuthLogin();
+  } catch (err){
+    resetAuthChooser();
+    log(`❌ ${err.message}`, true);
+  }
+});
+
+/* =====================================================================
+   UI STATE SYNC
+   ===================================================================== */
+function setOnline(on){
+  state.connected = on;
+  if (on){
+    statusLed.classList.add("online");
+    statusLabel.textContent = "ONLINE";
+    statusLabel.className = "online";
+    connectBtn.disabled = true;
+    connectBtn.textContent = "CONNECTED";
+    disconnectBtn.disabled = false;
+    manualTradeBtn.disabled = false;
+    autoTradeBtn.disabled = false;
+    patInput.disabled = true;
+    connectBtn.disabled = true;
+    oauthLoginBtn.disabled = true;
+    authMethod.disabled = true;
+  } else {
+    statusLed.classList.remove("online");
+    statusLabel.textContent = "OFFLINE";
+    statusLabel.className = "offline";
+    connectBtn.disabled = false;
+    connectBtn.textContent = "CONNECT";
+    disconnectBtn.disabled = true;
+    manualTradeBtn.disabled = true;
+    autoTradeBtn.disabled = true;
+    patInput.disabled = false;
+    // Preserve auto-trade across unexpected WebSocket reconnects.
+    // Explicit user disconnect calls setAutoTrade(false) in disconnectSession().
+  }
+}
+
+function getNextAutoTradeTickTarget(){
+  if (tickModeCombo.value === "random"){
+    const choices = [1, 3, 5, 7, 9];
+    return choices[Math.floor(Math.random() * choices.length)];
+  }
+  return Math.max(1, parseInt(intervalSpin.value, 10) || 1);
+}
+
+function describeAutoTradeTickTarget(){
+  return tickModeCombo.value === "random"
+    ? `random ticks (next target: ${state.autoTradeTickTarget})`
+    : `${state.autoTradeTickTarget} ticks`;
+}
+
+function setAutoTrade(on, silent){
+  state.autoTrade = on;
+  if (on){
+    autoTradeBtn.textContent = "ON";
+    autoTradeBtn.classList.add("on");
+    state.tickCounter = 0;
+    state.autoTradeTickTarget = getNextAutoTradeTickTarget();
+    if (!silent) log(`Auto-trade ENABLED – trading every ${describeAutoTradeTickTarget()} (continuous mode)`);
+  } else {
+    autoTradeBtn.textContent = "OFF";
+    autoTradeBtn.classList.remove("on");
+    state.tickCounter = 0;
+    if (!silent) log("Auto-trade DISABLED");
+  }
+}
+
+function updateBalanceUI(){
+  balanceLabel.textContent = `💰 BAL: ${state.balance.toFixed(2)} ${state.currency}`;
+}
+function updatePriceUI(){
+  const dp = getDecimalPlaces(state.symbol);
+  priceLabel.textContent = `📈 PRICE: ${state.price.toFixed(dp)}`;
+  digitLabel.textContent = `🔢 LAST DIGIT: ${state.lastDigit}`;
+}
+
+/* =====================================================================
+   STATS + HISTORY
+   ===================================================================== */
+function updateStats(profit){
+  if (profit > 0) state.tradesWon++;
+  else if (profit < 0) state.tradesLost++;
+  state.totalPL += profit;
+  statsWon.textContent = `🏆 Won: ${state.tradesWon}`;
+  statsLost.textContent = `💀 Lost: ${state.tradesLost}`;
+  statsTotalPl.textContent = `💰 Total P/L: ${fmtSigned(state.totalPL)}`;
+  statsTotalPl.style.color = state.totalPL >= 0 ? "var(--green)" : "#ff5555";
+  statsTotalPl.style.textShadow = state.totalPL >= 0
+    ? "0 0 12px rgba(0,255,128,.6)" : "0 0 12px rgba(255,85,85,.6)";
+  console.log(`[AutoTrader Stats] Won=${state.tradesWon} Lost=${state.tradesLost} Total=${state.totalPL.toFixed(2)}`);
+}
+
+function renderHistory(){
+  const rows = state.history.slice(0, MAX_HISTORY_ROWS);
+  if (rows.length === 0){
+    historyBody.innerHTML =
+      `<tr><td colspan="4" style="text-align:center;color:#556;padding:22px">No trades yet</td></tr>`;
+    return;
+  }
+  historyBody.innerHTML = rows.map(r => {
+    let plClass = "", plText = "--";
+    if (r.pl !== null && r.pl !== undefined){
+      plClass = r.pl >= 0 ? "pl-pos" : "pl-neg";
+      plText = fmtSigned(r.pl);
+    }
+    return `<tr>
+      <td>${escapeHtml(r.time)}</td>
+      <td>${escapeHtml(r.price)}</td>
+      <td class="${plClass}">${plText}</td>
+      <td>${escapeHtml(r.status)}</td>
+    </tr>`;
+  }).join("");
+}
+
+function addHistoryEntry(contractId, price, pl, status){
+  const dp = getDecimalPlaces(state.symbol);
+  state.history.unshift({
+    id: contractId, time: new Date().toLocaleString(),
+    price: price.toFixed(dp), pl: pl, status: status
+  });
+  if (state.history.length > 60) state.history.length = 60;
+  renderHistory();
+}
+
+function updateHistoryEntry(contractId, pl, status){
+  const row = state.history.find(r => r.id === contractId);
+  if (!row) return;
+  if (pl !== null && pl !== undefined) row.pl = pl;
+  if (status) row.status = status;
+  renderHistory();
+}
+
+/* =====================================================================
+   WEBSOCKET HELPERS
+   ===================================================================== */
+function nextReqId(){ state.reqCounter += 1; return state.reqCounter; }
+function sendWs(req){
+  if (state.ws && state.ws.readyState === WebSocket.OPEN){
+    state.ws.send(JSON.stringify(req));
+    dbg(`WS SEND: ${JSON.stringify(req)}`);
+    return true;
+  }
+  log("WebSocket not open – request dropped", true);
+  return false;
+}
+
+/* =====================================================================
+   CREDENTIAL READER / PAT LOGIN
+   ===================================================================== */
+function readCredentials(){
+  const appId = HARDCODED_APP_ID;
+  const pat = sanitizeToken(patInput.value);
+  if (!pat) throw new Error("PAT token is required.");
+  return { appId, pat };
+}
+
+
+/**
+ * Connect to the real Options account using a Personal Access Token.
+ *
+ * PAT authentication uses the same REST -> OTP -> WebSocket flow as OAuth,
+ * but the PAT is sent as a Bearer token and fetchAccounts()/fetchOtpUrl()
+ * add the required Deriv-App-ID header.
+ */
+async function connectReal(appId, pat){
+  state.disconnecting = false;
+  if (!appId) throw new Error("Deriv App ID is missing.");
+  if (!pat) throw new Error("PAT token is missing.");
+
+  state.authMethod = "pat";
+  state.appId = appId;
+  state.patToken = pat;
+  state.oauthAuthInfo = null;
+
+  log("Step 1/3 — fetching Deriv accounts using PAT…");
+  const accounts = await fetchAccounts(appId, pat);
+  log(`   ↳ ${accounts.length} account(s) returned`);
+
+  const realAcc = accounts.find(a => String(a.account_type).toLowerCase() === "real")
+               || accounts.find(a => String(a.account_type).toLowerCase() !== "demo");
+
+  if (!realAcc){
+    throw new Error("No real account found for this PAT.");
+  }
+
+  state.connectedAppId = appId;
+  state.accountId = realAcc.account_id;
+  state.balance = parseFloat(realAcc.balance || "0");
+  state.currency = realAcc.currency || "USD";
+  updateBalanceUI();
+
+  if (!state.accountId){
+    throw new Error("Deriv returned a real account without an account ID.");
+  }
+
+  log(`   ↳ using ${state.accountId} · ${state.balance.toFixed(2)} ${state.currency}`);
+
+  log("Step 2/3 — requesting OTP WebSocket URL…");
+  const wsUrl = await fetchOtpUrl(appId, pat, state.accountId);
+  log("   ↳ OTP acquired");
+
+  log("Step 3/3 — opening authenticated WebSocket…");
+  state.ws = new WebSocket(wsUrl);
+  state.ws.onopen = onWsOpen;
+  state.ws.onmessage = onWsMessage;
+  state.ws.onerror = onWsError;
+  state.ws.onclose = onWsClose;
+}
+
+/* =====================================================================
+   LOGIN FLOW
+   ===================================================================== */
+connectBtn.addEventListener("click", async () => {
+  if (!isPatAuth()) return;
+
+  let creds;
+  try {
+    creds = readCredentials();
+  } catch (err){
+    log(`❌ ${err.message}`, true);
+    return;
+  }
+
+  savePat(creds.pat);
+
+  const rawPat = patInput.value;
+  if (sanitizeToken(rawPat) !== rawPat){
+    log(`⚠️ PAT was sanitized (removed ${rawPat.length - sanitizeToken(rawPat).length} whitespace/control char(s))`);
+  }
+
+  connectBtn.disabled = true;
+  connectBtn.textContent = "CONNECTING…";
+  log("Authenticating with PAT…");
+
+  try {
+    await connectReal(creds.appId, creds.pat);
+  } catch (err){
+    log(`Connection failed: ${err.message}`, true);
+    connectBtn.disabled = false;
+    connectBtn.textContent = "CONNECT";
+    state.connectedAppId = null;
+  }
+});
+
+/* =====================================================================
+   WEBSOCKET LIFECYCLE
+   ===================================================================== */
+function startKeepAlive(){
+  if (state.keepAliveTimer) clearInterval(state.keepAliveTimer);
+
+  // Deriv supports an application-level ping request. Keep this traffic
+  // separate from the tick stream so it does not affect trading logic.
+  state.keepAliveTimer = setInterval(() => {
+    if (state.disconnecting) return;
+    if (state.ws && state.ws.readyState === WebSocket.OPEN){
+      sendWs({ ping: 1 });
+    }
+  }, KEEPALIVE_MS);
+}
+
+function subscribeToTicks(reason = "connect") {
+  if (state.disconnecting || !state.ws || state.ws.readyState !== WebSocket.OPEN) return false;
+
+  // A new WebSocket gets a new subscription id. Never compare the new
+  // stream against the old socket's subscription id.
+  state.tickSubscriptionId = null;
+  state.lastTickAt = 0;
+
+  const tickReqId = nextReqId();
+  state.pendingRequests[tickReqId] = "tick_subscription";
+  const sent = sendWs({ ticks: state.symbol, subscribe: 1, req_id: tickReqId });
+  if (sent) dbg(`Tick subscription requested (${reason}) for ${state.symbol}`);
+  return sent;
+}
+
+function startTickWatchdog(){
+  if (state.tickWatchdogTimer) clearInterval(state.tickWatchdogTimer);
+
+  // If the socket is open but ticks have stopped arriving, resubscribe
+  // instead of leaving auto-trade stuck waiting forever.
+  state.tickWatchdogTimer = setInterval(() => {
+    if (state.disconnecting || !state.connected) return;
+    if (!state.ws || state.ws.readyState !== WebSocket.OPEN) return;
+
+    const staleFor = state.lastTickAt ? Date.now() - state.lastTickAt : Infinity;
+    if (staleFor > 10000) {
+      subscribeToTicks("watchdog");
+    }
+  }, 5000);
+}
+
+function stopTickWatchdog(){
+  if (state.tickWatchdogTimer){
+    clearInterval(state.tickWatchdogTimer);
+    state.tickWatchdogTimer = null;
+  }
+}
+
+function scheduleReconnect(){
+  if (state.disconnecting || state.reconnectTimer) return;
+  if (!state.patToken && !(state.oauthAuthInfo && state.oauthAuthInfo.access_token)) return;
+
+  state.reconnecting = true;
+  connectBtn.disabled = true;
+  connectBtn.textContent = "RECONNECTING…";
+  disconnectBtn.disabled = false;
+  log(`WebSocket lost — reconnecting in ${RECONNECT_DELAY_MS / 1000}s…`, true);
+
+  state.reconnectTimer = setTimeout(async () => {
+    state.reconnectTimer = null;
+    if (state.disconnecting) return;
+
+    try {
+      if (state.authMethod === "pat") {
+        await connectReal(state.appId || HARDCODED_APP_ID, state.patToken);
+      } else if (state.authMethod === "oauth" && state.oauthAuthInfo?.access_token) {
+        await connectWithOAuthAuth(state.oauthAuthInfo);
+      } else {
+        throw new Error("No reusable authentication credentials available for reconnect.");
+      }
+      state.reconnecting = false;
+    } catch (err){
+      log(`Reconnect failed: ${err.message || err}`, true);
+      state.reconnecting = false;
+      scheduleReconnect();
+    }
+  }, RECONNECT_DELAY_MS);
+}
+
+function onWsOpen(){
+  const wasReconnect = state.reconnecting;
+  state.disconnecting = false;
+  state.reconnecting = false;
+  if (state.reconnectTimer){
+    clearTimeout(state.reconnectTimer);
+    state.reconnectTimer = null;
+  }
+
+  log("✅ WebSocket connected");
+
+  sendWs({ balance: 1, subscribe: 1, req_id: nextReqId() });
+
+  subscribeToTicks(wasReconnect ? "reconnect" : "connect");
+
+  // If an active contract survived a transient socket failure, restore its
+  // proposal_open_contract subscription so TP/settlement monitoring resumes.
+  if (state.tradingCycleActive && state.contractId){
+    sendWs({
+      proposal_open_contract: 1,
+      contract_id: state.contractId,
+      subscribe: 1,
+      req_id: nextReqId()
+    });
+  }
+
+  startKeepAlive();
+  startTickWatchdog();
+  setOnline(true);
+
+  // An unexpected reconnect must not require the user to re-enable
+  // auto-trade. Keep the previous state and let the next tick resume the
+  // normal trading cycle once the socket is ready.
+  if (wasReconnect && state.autoTrade){
+    // A proposal request is tied to the old WebSocket and cannot survive a
+    // reconnect. If there is no live contract, release that incomplete cycle
+    // so the normal tick-driven auto-trade engine can start a fresh contract.
+    if (!state.contractId && state.tradingCycleActive){
+      state.tradingCycleActive = false;
+      state.pendingProposal = false;
+      state.activeTradeInitialBalance = null;
+      state.activeStake = null;
+      state.entryPrice = null;
+      state.balance = state.accountBalance;
+      updateBalanceUI();
+      dbg("Cleared incomplete pre-reconnect trade cycle; auto-trade can resume");
+    }
+    state.tickCounter = 0;
+    dbg("Auto-trade restored after WebSocket reconnect");
+  }
+}
+
+function onWsError(err){
+  log(`WebSocket error: ${err.message || err}`, true);
+}
+
+function onWsClose(){
+  if (state.keepAliveTimer){
+    clearInterval(state.keepAliveTimer);
+    state.keepAliveTimer = null;
+  }
+  stopTickWatchdog();
+  state.tickSubscriptionId = null;
+  state.lastTickAt = 0;
+
+  if (state.disconnecting) {
+    setOnline(false);
+    return;
+  }
+
+  // A proposal/buy request cannot be resumed on a new WebSocket. If there is
+  // no live contract, release the in-flight cycle immediately so auto-trade
+  // can place a fresh contract after reconnect. A real active contract is
+  // preserved and its contract subscription is restored in onWsOpen().
+  if (!state.contractId && state.tradingCycleActive){
+    state.tradingCycleActive = false;
+    state.pendingProposal = false;
+    state.activeTradeInitialBalance = null;
+    state.activeStake = null;
+    state.entryPrice = null;
+    state.balance = state.accountBalance;
+    updateBalanceUI();
+  }
+
+  setOnline(false);
+  scheduleReconnect();
+}
+
+/* =====================================================================
+   TICK FILTER
+   ===================================================================== */
+function isTickForCurrentSymbol(tick, envelopeSub){
+  const tickSymbol = tick && tick.symbol ? String(tick.symbol) : null;
+  if (tickSymbol && tickSymbol !== state.symbol){
+    dbg(`Ignoring stale tick: symbol=${tickSymbol}, current=${state.symbol}`);
+    return false;
+  }
+
+  const subId = (tick && tick.subscription && tick.subscription.id)
+             || (envelopeSub && envelopeSub.id)
+             || null;
+  if (subId && state.tickSubscriptionId && subId !== state.tickSubscriptionId){
+    dbg(`Ignoring stale tick: subscription=${subId}, current=${state.tickSubscriptionId}`);
+    return false;
+  }
+
+  return true;
+}
+
+/* =====================================================================
+   HELPER — detect benign "already subscribed" errors
+   ===================================================================== */
+function isAlreadySubscribedError(errObj){
+  if (!errObj) return false;
+  const code = String(errObj.code || "").toLowerCase();
+  const msg  = String(errObj.message || "").toLowerCase();
+  return code === "alreadysubscribed"
+      || code === "already_subscribed"
+      || msg.includes("already subscribed")
+      || msg.includes("already_subscribed");
+}
+
+function onWsMessage(event){
+  let msg;
+  try { msg = JSON.parse(event.data); }
+  catch (e){ log(`Parse error: ${e.message}`, true); return; }
+
+  dbg(`WS RECV: ${event.data.slice(0, 300)}`);
+
+  const reqId = msg.req_id;
+
+  /* ---------- Tick ---------- */
+  if (msg.tick){
+    const tick = msg.tick;
+
+    if (!isTickForCurrentSymbol(tick, msg.subscription)){
+      return;
+    }
+
+    /* Opportunistically capture the subscription id from the tick envelope
+       if we don't have one yet. This recovers gracefully after a symbol
+       switch where the subscribe confirmation was rejected as
+       "already subscribed". */
+    if (!state.tickSubscriptionId
+        && msg.subscription && msg.subscription.id){
+      state.tickSubscriptionId = msg.subscription.id;
+      dbg(`Recovered tick subscription id=${state.tickSubscriptionId} from tick stream`);
+    }
+
+    state.lastTickAt = Date.now();
+
+    const quote = parseFloat(tick.quote);
+    if (!isNaN(quote)){
+      state.price = quote;
+      state.lastDigit = lastDigitFromPrice(quote, state.symbol);
+      updatePriceUI();
+      onRealTick();
+    }
+    return;
+  }
+
+  /* ---------- Balance ---------- */
+  if (msg.balance){
+    state.accountBalance = parseFloat(msg.balance.balance);
+    state.currency = msg.balance.currency || state.currency;
+
+    // While a contract is active, show the amount that was available
+    // immediately before the trade minus the active stake. Do not let
+    // subsequent balance subscription messages overwrite that display.
+    if (state.tradingCycleActive && state.activeTradeInitialBalance !== null && state.activeStake !== null){
+      state.balance = Math.max(0, state.activeTradeInitialBalance - state.activeStake);
+    } else {
+      state.balance = state.accountBalance;
+    }
+
+    updateBalanceUI();
+    return;
+  }
+
+  /* ---------- Trade flow ---------- */
+  if (msg.proposal){ onRealProposal(msg.proposal); return; }
+  if (msg.buy){ onRealBuy(msg.buy); return; }
+  if (msg.proposal_open_contract){ onRealContractUpdate(msg.proposal_open_contract); return; }
+  if (msg.sell){ onRealSell(msg.sell); return; }
+
+  /* ---------- Subscription confirmations ---------- */
+  if (msg.subscription && reqId && state.pendingRequests[reqId]){
+    const kind = state.pendingRequests[reqId];
+    delete state.pendingRequests[reqId];
+    if (kind === "tick_subscription"){
+      state.tickSubscriptionId = msg.subscription.id;
+    }
+    return;
+  }
+
+  /* ---------- Errors ----------
+     Benign case: "already subscribed" for a tick request.
+     Deriv hasn't processed our previous forget yet, so we're still
+     receiving ticks for the symbol we just re-subscribed to. That's
+     exactly what we want — silently absorb it and let the tick stream
+     keep updating the price. We still clear the pending request entry
+     so it doesn't leak. */
+  if (msg.error){
+    const wasTickSub = reqId && state.pendingRequests[reqId] === "tick_subscription";
+    if (wasTickSub){
+      delete state.pendingRequests[reqId];
+    }
+
+    if (wasTickSub && isAlreadySubscribedError(msg.error)){
+      dbg(`Benign: already subscribed to ${state.symbol} — ticks are flowing, ignoring`);
+      return;
+    }
+
+    log(`API Error: ${msg.error.message || JSON.stringify(msg.error)}`, true);
+    state.tradingCycleActive = false;
+    state.pendingProposal = false;
+    return;
+  }
+}
+
+/* =====================================================================
+   TICK HANDLER
+   ===================================================================== */
+function onRealTick(){
+  if (state.autoTrade && state.connected && !state.tradingCycleActive){
+    state.tickCounter++;
+    const interval = Math.max(1, state.autoTradeTickTarget || getNextAutoTradeTickTarget());
+
+    if (state.tickCounter >= interval){
+      state.tickCounter = 0;
+      startTradeCycle();
+      return;
+    }
+  }
+
+  if (state.tpTicksActive && state.contractId){
+    state.tpTicksElapsed++;
+    if (state.tpTicksElapsed >= state.tpTicksTarget){
+      // Target reached; the existing contract-management flow handles the sale.
+    }
+  }
+}
+
+/* =====================================================================
+   BALANCE GUARD
+   ===================================================================== */
+function checkBalanceGuard(stake, action){
+  if (state.balance < MIN_BALANCE_USD){
+    return {
+      ok: false,
+      reason: "min-balance",
+      title: "⚠️ Insufficient Balance",
+      message:
+        `Your balance is ${state.balance.toFixed(2)} ${state.currency}.\n\n` +
+        `The minimum required to ${action} is ` +
+        `${MIN_BALANCE_USD.toFixed(2)} ${state.currency}.\n\n` +
+        `Please deposit funds or switch to a funded account, then try again.`
+    };
+  }
+
+  if (stake > state.balance){
+    return {
+      ok: false,
+      reason: "stake-exceeds-balance",
+      title: "⚠️ Stake Exceeds Balance",
+      message:
+        `Your stake is ${stake.toFixed(2)} ${state.currency}, ` +
+        `but your balance is only ${state.balance.toFixed(2)} ${state.currency}.\n\n` +
+        `Reduce your stake or deposit more funds, then try again.`
+    };
+  }
+
+  return { ok: true };
+}
+
+/* =====================================================================
+   TRADING CYCLE
+   ===================================================================== */
+function getTakeProfitValueAndType(){
+  if (tpTypeCombo.value === "amount"){
+    return { value: parseFloat(tpAmountSpin.value) || 0.01, type: "amount" };
+  }
+  return { value: parseInt(tpTicksSpin.value, 10) || 1, type: "ticks" };
+}
+
+function startTradeCycle(){
+  if (state.tradingCycleActive){
+    log("Trade cycle already active, skipping", true);
+    return;
+  }
+  const stake = parseFloat(stakeSpin.value) || 0;
+
+  const guard = checkBalanceGuard(stake, "trade");
+  if (!guard.ok){
+    log(`⚠️ Trade blocked: ${guard.reason} ` +
+        `(balance=$${state.balance.toFixed(2)}, stake=$${stake.toFixed(2)})`, true);
+    if (state.autoTrade) {
+      log("Auto-trade turned OFF due to insufficient balance.", true);
+      setAutoTrade(false, true);
+    }
+    return;
+  }
+
+  state.tradingCycleActive = true;
+  state.pendingProposal = true;
+  state.activeTradeInitialBalance = state.accountBalance || state.balance;
+  state.activeStake = stake;
+  state.entryPrice = state.price;
+  state.balance = Math.max(0, state.activeTradeInitialBalance - stake);
+  updateBalanceUI();
+
+  const tp = getTakeProfitValueAndType();
+  const growth = parseFloat(growthRateCombo.value);
+
+  const request = {
+    proposal: 1,
+    amount: stake,
+    basis: "stake",
+    contract_type: "ACCU",
+    currency: state.currency,
+    underlying_symbol: state.symbol,
+    growth_rate: growth,
+    req_id: nextReqId()
+  };
+
+  if (tp.type === "amount"){
+    request.limit_order = { take_profit: tp.value };
+  }
+
+  log(`Requesting ACCU proposal: stake=$${stake.toFixed(2)}, ` +
+      `take profit=${tp.type === "amount" ? "$" + tp.value : tp.value + " ticks"}, ` +
+      `growth=${(growth * 100).toFixed(0)}%, symbol=${state.symbol}`);
+
+  sendWs(request);
+}
+
+function onRealProposal(proposal){
+  state.pendingProposal = false;
+  if (proposal.error){
+    log(`Proposal error: ${proposal.error.message || JSON.stringify(proposal.error)}`, true);
+    state.tradingCycleActive = false;
+    state.activeTradeInitialBalance = null;
+    state.balance = state.accountBalance;
+    updateBalanceUI();
+    return;
+  }
+  if (!proposal.id){
+    log("Proposal missing id", true);
+    state.tradingCycleActive = false;
+    state.activeTradeInitialBalance = null;
+    state.balance = state.accountBalance;
+    updateBalanceUI();
+    return;
+  }
+  log(`Proposal received: id=${proposal.id}, ask=${proposal.ask_price}`);
+  sendWs({ buy: proposal.id, price: state.activeStake, req_id: nextReqId() });
+}
+
+function onRealBuy(buy){
+  if (buy.error){
+    log(`Buy error: ${buy.error.message || JSON.stringify(buy.error)}`, true);
+    state.tradingCycleActive = false;
+    state.activeTradeInitialBalance = null;
+    state.balance = state.accountBalance;
+    updateBalanceUI();
+    return;
+  }
+  if (!buy.contract_id){
+    log("Buy response missing contract_id", true);
+    state.tradingCycleActive = false;
+    state.activeTradeInitialBalance = null;
+    state.balance = state.accountBalance;
+    updateBalanceUI();
+    return;
+  }
+
+  state.contractId = buy.contract_id;
+  logOk(`Contract bought! ID: ${state.contractId}`);
+
+  // The displayed balance was reserved when the trade cycle started.
+  // Keep it as initial balance minus the active stake while the contract is open.
+  updateBalanceUI();
+  addHistoryEntry(state.contractId, state.entryPrice, null, "Open");
+
+  sendWs({
+    proposal_open_contract: 1,
+    contract_id: state.contractId,
+    subscribe: 1,
+    req_id: nextReqId()
+  });
+
+  const tp = getTakeProfitValueAndType();
+  if (tp.type === "ticks"){
+    state.tpTicksActive = true;
+    state.tpTicksTarget = tp.value;
+    state.tpTicksElapsed = 0;
+    log(`Tick counting started: will sell after ${tp.value} ticks`);
+  } else {
+    state.tpTicksActive = false;
+  }
+}
+
+function onRealContractUpdate(contract){
+  if (contract.contract_id !== state.contractId){
+    dbg(`Ignoring contract ${contract.contract_id} (active: ${state.contractId})`);
+    return;
+  }
+
+  if (contract.subscription && contract.subscription.id){
+    state.contractSubscriptionId = contract.subscription.id;
+  }
+
+  const profit     = parseFloat(contract.profit || "0");
+  const bidPrice   = contract.bid_price != null ? parseFloat(contract.bid_price) : null;
+  const status     = String(contract.status || "open").toLowerCase();
+
+  const isValidToSell = contract.is_valid_to_sell === 1
+                     || contract.is_valid_to_sell === "1"
+                     || contract.is_valid_to_sell === true;
+  const isSold     = contract.is_sold === 1
+                  || contract.is_sold === "1"
+                  || contract.is_sold === true;
+  const isExpired  = contract.is_expired === 1
+                  || contract.is_expired === "1"
+                  || contract.is_expired === true;
+  const isSettled  = isSold || isExpired
+                  || status === "sold"
+                  || status === "won"
+                  || status === "lost"
+                  || status === "expired";
+
+  log(`Contract ${state.contractId}: profit=${fmtSigned(profit)}, ` +
+      `bid=${bidPrice !== null ? bidPrice.toFixed(4) : "n/a"}, ` +
+      `valid_to_sell=${isValidToSell ? 1 : 0}, status=${status}`);
+
+  if (state.tpTicksActive && state.tpTicksElapsed >= state.tpTicksTarget){
+    if (!isSettled && isValidToSell && bidPrice && bidPrice > 0){
+      log(`Selling contract ${state.contractId} at bid ${bidPrice} (tick target reached)`);
+      sendWs({ sell: state.contractId, price: bidPrice, req_id: nextReqId() });
+      state.tpTicksActive = false;
+    } else if (!isSettled && !isValidToSell){
+      log(`Cannot sell contract ${state.contractId} yet — waiting for valid sell window`, true);
+    }
+  }
+
+  if (isSettled){
+    const finalProfit = parseFloat(contract.profit || "0");
+    const settleReason = isSold
+      ? "sold"
+      : (isExpired ? "expired" : status);
+
+    logOk(`Contract ${state.contractId} settled (${settleReason}). Final P/L = ${fmtSigned(finalProfit)} USD`);
+
+    updateHistoryEntry(state.contractId, finalProfit, "Settled");
+    updateStats(finalProfit);
+
+    if (state.contractSubscriptionId){
+      sendWs({ forget: state.contractSubscriptionId, req_id: nextReqId() });
+      state.contractSubscriptionId = null;
+    }
+
+    finishCycle();
+
+    if (state.autoTrade){
+      log(`🔄 Auto-trade ready for next cycle (${describeAutoTradeTickTarget()})`);
+    }
+    return;
+  }
+
+  updateHistoryEntry(state.contractId, profit, "Open");
+}
+
+function onRealSell(sell){
+  if (sell.error){
+    log(`Sell error: ${sell.error.message || JSON.stringify(sell.error)}`, true);
+    return;
+  }
+  if (sell.contract_id !== state.contractId) return;
+
+  const soldFor = parseFloat(sell.sold_for || "0");
+  const profit = soldFor - state.activeStake;
+
+  logOk(`Contract ${state.contractId} sold. Sold for: $${soldFor.toFixed(2)}, ` +
+        `Stake: $${state.activeStake.toFixed(2)} → Profit = ${fmtSigned(profit)} USD`);
+
+  updateHistoryEntry(state.contractId, profit, "Settled (Manual)");
+  updateStats(profit);
+
+  if (state.contractSubscriptionId){
+    sendWs({ forget: state.contractSubscriptionId, req_id: nextReqId() });
+    state.contractSubscriptionId = null;
+  }
+
+  finishCycle();
+
+  if (state.autoTrade){
+    log(`🔄 Auto-trade ready for next cycle (${describeAutoTradeTickTarget()})`);
+  }
+}
+
+function finishCycle(){
+  state.tradingCycleActive = false;
+  state.pendingProposal = false;
+  state.tickCounter = 0;
+  if (state.autoTrade) state.autoTradeTickTarget = getNextAutoTradeTickTarget();
+  // Once the contract is settled, the next balance subscription/response
+  // should be allowed to become the displayed balance again.
+  state.activeTradeInitialBalance = null;
+  state.balance = state.accountBalance;
+  updateBalanceUI();
+  state.contractId = null;
+  state.contractSubscriptionId = null;
+  state.activeStake = null;
+  state.entryPrice = null;
+  state.tpTicksActive = false;
+  state.tpTicksTarget = 0;
+  state.tpTicksElapsed = 0;
+  state.tickCounter = 0;
+  dbg("Cycle finished — ready for next trade");
+}
+
+/* =====================================================================
+   AUTO-TRADE TOGGLE
+   ===================================================================== */
+function disableAutoTradeIfInsufficient(){
+  const stake = parseFloat(stakeSpin.value) || 0;
+  if (state.autoTrade && !state.tradingCycleActive){
+    const guard = checkBalanceGuard(stake, "continue auto-trading");
+    if (!guard.ok){
+      log(`⚠️ Auto-trade disabled: ${guard.reason} ` +
+          `(balance=$${state.balance.toFixed(2)}, stake=$${stake.toFixed(2)})`, true);
+      setAutoTrade(false, true);
+      return true;
+    }
+  }
+  return false;
+}
+
+autoTradeBtn.addEventListener("click", async () => {
+  if (!state.connected){
+    log("Cannot toggle auto-trade: not connected", true);
+    await showAlert(
+      "⚠️ Not Connected",
+      "Please connect to your Deriv account first by pressing CONNECT.",
+      { confirmText: "OK", confirmKind: "warning" }
+    );
+    return;
+  }
+
+  if (state.autoTrade){
+    setAutoTrade(false);
+    return;
+  }
+
+  const stake = parseFloat(stakeSpin.value) || 0;
+  const guard = checkBalanceGuard(stake, "start auto-trade");
+
+  if (!guard.ok){
+    log(`⚠️ Auto-trade blocked: ${guard.reason} ` +
+        `(balance=$${state.balance.toFixed(2)}, stake=$${stake.toFixed(2)})`, true);
+    setAutoTrade(false, true);
+    await showAlert(guard.title, guard.message, {
+      confirmText: "OK", confirmKind: "warning"
+    });
+    return;
+  }
+
+  setAutoTrade(true);
+});
+
+manualTradeBtn.addEventListener("click", async () => {
+  if (!state.connected){
+    log("Not connected", true);
+    await showAlert(
+      "⚠️ Not Connected",
+      "Please connect to your Deriv account first by pressing CONNECT.",
+      { confirmText: "OK", confirmKind: "warning" }
+    );
+    return;
+  }
+  if (state.tradingCycleActive){
+    log("Trade already in progress", true);
+    return;
+  }
+
+  const stake = parseFloat(stakeSpin.value) || 0;
+  const guard = checkBalanceGuard(stake, "place a manual trade");
+  if (!guard.ok){
+    log(`⚠️ Manual trade blocked: ${guard.reason} ` +
+        `(balance=$${state.balance.toFixed(2)}, stake=$${stake.toFixed(2)})`, true);
+    await showAlert(guard.title, guard.message, {
+      confirmText: "OK", confirmKind: "warning"
+    });
+    return;
+  }
+
+  startTradeCycle();
+});
+
+/* =====================================================================
+   FIELD WIRING
+   ===================================================================== */
+stakeSpin.addEventListener("input", () => {
+  if (state.autoTrade) disableAutoTradeIfInsufficient();
+});
+intervalSpin.addEventListener("input", () => {
+  if (tickModeCombo.value === "fixed") state.autoTradeTickTarget = Math.max(1, parseInt(intervalSpin.value, 10) || 1);
+  if (state.autoTrade){
+    state.tickCounter = 0;
+    log("Trade interval changed – tick counter reset to 0");
+  }
+});
+tickModeCombo.addEventListener("change", () => {
+  const randomMode = tickModeCombo.value === "random";
+  intervalSpin.disabled = randomMode;
+  intervalLabel.textContent = randomMode ? "Random set:" : "Trade every:";
+  intervalUnit.style.display = randomMode ? "none" : "";
+  state.tickCounter = 0;
+  state.autoTradeTickTarget = getNextAutoTradeTickTarget();
+  if (state.autoTrade) log(`Auto-trade tick mode changed: ${describeAutoTradeTickTarget()}`);
+});
+tickModeCombo.dispatchEvent(new Event("change"));
+tpTypeCombo.addEventListener("change", () => {
+  if (tpTypeCombo.value === "amount"){
+    tpAmountSpin.style.display = ""; tpTicksSpin.style.display = "none"; tpUnitHint.textContent = "USD";
+  } else {
+    tpAmountSpin.style.display = "none"; tpTicksSpin.style.display = ""; tpUnitHint.textContent = "ticks";
+  }
+});
+tpTypeCombo.dispatchEvent(new Event("change"));
+
+/* =====================================================================
+   INDEX CHANGE
+   ===================================================================== */
+indexCombo.addEventListener("change", () => {
+  const newSymbol = indexCombo.value;
+
+  if (newSymbol === state.symbol){
+    return;
+  }
+
+  log(`Switching index: ${state.symbol} → ${newSymbol}`);
+
+  /* Update symbol FIRST so the tick filter immediately rejects old ticks */
+  state.symbol = newSymbol;
+
+  state.tickCounter = 0;
+  state.price = 0;
+  state.lastDigit = null;
+  priceLabel.textContent = "📈 PRICE: --";
+  digitLabel.textContent = "🔢 LAST DIGIT: --";
+
+  if (!state.connected || !state.ws || state.ws.readyState !== WebSocket.OPEN){
+    log(`Index set to ${state.symbol} (will subscribe on connect)`);
+    return;
+  }
+
+  /* Forget the old subscription (if any) */
+  if (state.tickSubscriptionId){
+    sendWs({ forget: state.tickSubscriptionId, req_id: nextReqId() });
+  }
+
+  state.tickSubscriptionId = null;
+
+  /* Subscribe to the new symbol */
+  subscribeToTicks("symbol-change");
+
+});
+
+/* =====================================================================
+   DISCONNECT
+   ===================================================================== */
+function disconnectSession(){
+  state.disconnecting = true;
+  state.reconnecting = false;
+  if (state.reconnectTimer){ clearTimeout(state.reconnectTimer); state.reconnectTimer = null; }
+  if (state.keepAliveTimer){ clearInterval(state.keepAliveTimer); state.keepAliveTimer = null; }
+  stopTickWatchdog();
+  if (state.ws){ try { state.ws.close(); } catch (e){} state.ws = null; }
+
+  state.tickSubscriptionId = null;
+  state.pendingRequests = {};
+  state.contractSubscriptionId = null;
+
+  if (state.autoTrade) setAutoTrade(false, true);
+  state.tradingCycleActive = false;
+  state.pendingProposal = false;
+  state.contractId = null;
+  state.activeStake = null;
+  state.entryPrice = null;
+  state.tpTicksActive = false;
+  state.tpTicksTarget = 0;
+  state.tpTicksElapsed = 0;
+  state.tickCounter = 0;
+  state.price = 0;
+  state.lastDigit = null;
+
+  state.connectedAppId = null;
+
+  priceLabel.textContent = "📈 PRICE: --";
+  digitLabel.textContent = "🔢 LAST DIGIT: --";
+  balanceLabel.textContent = "💰 BAL: --";
+
+  setOnline(false);
+  autoTradeBtn.textContent = "OFF";
+  autoTradeBtn.classList.remove("on");
+}
+
+function disconnectAll(){
+  disconnectSession();
+  clearPersistedAuth();
+  clearOAuthAuthInfo();
+  clearOAuthTransient();
+
+  state.history = [];
+  state.tradesWon = 0;
+  state.tradesLost = 0;
+  state.totalPL = 0;
+  renderHistory();
+  statsWon.textContent = "🏆 Won: 0";
+  statsLost.textContent = "💀 Lost: 0";
+  statsTotalPl.textContent = "💰 Total P/L: $0.00";
+  statsTotalPl.style.color = "var(--cyan)";
+  statsTotalPl.style.textShadow = "none";
+
+  // Clear the live log after all disconnect cleanup. Do not append a
+  // disconnect message, so the log remains completely empty.
+  logBox.innerHTML = "";
+}
+disconnectBtn.addEventListener("click", disconnectAll);
+
+/* =====================================================================
+   MARKUP STATISTICS
+   ===================================================================== */
+function getSelectedMarkupApp(){
+  const app = Object.values(MARKUP_APP_IDS).find(item => item.id === markupAppIdSelect.value);
+  return app || MARKUP_APP_IDS.web;
+}
+
+function updateMarkupAppSelection(){
+  const app = getSelectedMarkupApp();
+  state.markupAppId = app.id;
+  markupAppIdBadge.textContent = app.id;
+  $("mConnState").textContent = `🔗 ${app.label} · App ID ${app.id}`;
+  $("mConnState").className = "info";
+  $("mStatus").textContent = `Ready to load ${app.label} markup statistics.`;
+  $("mStatus").style.color = "#88aaff";
+  $("mTotalTrades").textContent = "--";
+  $("mActiveClients").textContent = "--";
+  $("mCommission").textContent = "--";
+  $("mVolume").textContent = "--";
+}
+
+async function fetchRealMarkup(){
+  if (!state.markupUnlocked || !markupAdminPassword){
+    log("Markup fetch blocked: tab is locked", true);
+    return;
+  }
+
+  const app = getSelectedMarkupApp();
+  state.markupAppId = app.id;
+  markupAppIdBadge.textContent = app.id;
+  $("mConnState").textContent = `🔗 Loading ${app.label} · App ID ${app.id}`;
+  $("mConnState").className = "info";
+
+  const today = new Date();
+  const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  const dateFrom = localDateYMD(firstOfMonth);
+  const dateTo   = localDateYMD(today);
+
+  $("mStatus").textContent = `Loading ${app.label} markup statistics…`;
+  $("mStatus").style.color = "var(--amber)";
+
+  try {
+    const resp = await fetch("/api/markup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "stats",
+        password: markupAdminPassword,
+        app_id: app.id,
+        date_from: dateFrom,
+        date_to: dateTo
+      })
+    });
+
+    const data = await resp.json().catch(() => ({}));
+    dbg(`Markup response ${resp.status}: ${JSON.stringify(data).slice(0, 500)}`);
+
+    if (!resp.ok || !data.ok){
+      throw new Error(data.error || `HTTP ${resp.status}`);
+    }
+
+    const s = data.data || {};
+    const selectedAppId = String(data.app_id || app.id);
+
+    // The API now returns ONLY the selected application's row. Do not use
+    // the aggregate across all registered applications for the UI.
+    if (selectedAppId !== app.id) {
+      throw new Error(`Server returned statistics for the wrong App ID (${selectedAppId}).`);
+    }
+
+    $("mTotalTrades").textContent   = Number(s.total_contract_count ?? 0).toLocaleString();
+    $("mActiveClients").textContent = Number(s.total_client_count ?? 0).toLocaleString();
+    $("mCommission").textContent    = "$" + Number(s.total_app_markup_usd ?? 0)
+      .toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    $("mVolume").textContent        = "$" + Number(s.total_volume_usd ?? 0)
+      .toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    $("mConnState").textContent = `🔗 ${app.label} · App ID ${app.id}`;
+    $("mConnState").className = "on";
+    $("mStatus").textContent = `✅ Markup loaded (${dateFrom} → ${dateTo})`;
+    $("mStatus").style.color = "var(--green)";
+    log(`Markup statistics updated for ${app.label} (${dateFrom} → ${dateTo})`);
+  } catch (err) {
+    $("mConnState").textContent = `⚠️ ${app.label} · App ID ${app.id}`;
+    $("mConnState").className = "off";
+    $("mStatus").textContent = `Error: ${(err.message || "Request failed").slice(0, 180)}`;
+    $("mStatus").style.color = "#ff5555";
+    log(`Markup fetch failed for ${app.label}: ${err.message}`, true);
+  }
+}
+
+markupAppIdSelect.addEventListener("change", () => {
+  updateMarkupAppSelection();
+  if (state.markupUnlocked) fetchRealMarkup();
+});
+
+$("refreshMarkup").addEventListener("click", fetchRealMarkup);
+
+/* =====================================================================
+   BOOTSTRAP
+   ===================================================================== */
+(async function boot(){
+  setOnline(false);
+  renderHistory();
+  // Restore the previous browser session on reload. Temporary OAuth PKCE
+  // state is still cleared/validated separately and is never reused here.
+  try { localStorage.removeItem(PAT_STORAGE_KEY); localStorage.removeItem("accutrader_oauth_auth_info"); } catch (_) {}
+  clearPatInput();
+  patInput.readOnly = true;
+  authMethod.value = "none";
+
+  state.markupUnlocked = false;
+  markupAppIdSelect.value = MARKUP_DEFAULT_APP_ID;
+  updateMarkupAppSelection();
+  updateMarkupVisibility();
+  updateAuthMethodUI();
+
+  log("Ready. Choose Login Using PAT Token or Sign In With Deriv.");
+  log("Deriv sign-in redirects to Deriv's secure OAuth 2.0 login.");
+  log("Tip: press Ctrl+Shift+D to toggle debug logging.");
+  log("⚠️ LIVE TRADING — real funds will be used.");
+
+  // Restore the previous authentication session after a reload. PAT uses the
+  // Software App; OAuth uses the Web App. Only one persisted method is restored.
+  const persistedMethod = getAuthCookie(AUTH_METHOD_COOKIE);
+  if (persistedMethod === "pat") {
+    const savedPat = loadPat();
+    if (savedPat) {
+      authMethod.value = "pat";
+      updateAuthMethodUI();
+      patInput.value = savedPat;
+      patInput.readOnly = true;
+      connectBtn.disabled = true;
+      connectBtn.textContent = "CONNECTING…";
+      log("Restoring previous PAT session…");
+      try {
+        await connectReal(HARDCODED_APP_ID, savedPat);
+      } catch (err) {
+        clearPersistedPat();
+        clearPatInput();
+        authMethod.value = "none";
+        updateAuthMethodUI();
+        connectBtn.disabled = true;
+        log(`Previous PAT session could not be restored: ${err.message}`, true);
+      }
+    }
+  } else {
+    // Complete an OAuth callback. If OAuth was initiated from the apex domain,
+    // start it again on the canonical www origin so sessionStorage remains same-origin.
+    const oauthResult = await restoreOAuthSession();
+    if (oauthResult === "start") {
+      try { await startOAuthLogin(); }
+      catch (err) { log(`❌ ${err.message}`, true); }
+    }
+  }
+})();
+
+window.addEventListener("beforeunload", () => {
+  // Page unload is an intentional browser shutdown, not a connection drop.
+  // Prevent the reconnect loop from starting while the page is leaving.
+  state.disconnecting = true;
+  if (state.reconnectTimer) clearTimeout(state.reconnectTimer);
+  if (state.keepAliveTimer) clearInterval(state.keepAliveTimer);
+  if (state.ws) try { state.ws.close(); } catch(e){}
+});
+</script>
+</body>
+</html>
