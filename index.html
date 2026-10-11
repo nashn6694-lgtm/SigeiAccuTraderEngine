@@ -1177,7 +1177,7 @@ function clearPersistedPat(){
 
    IMPORTANT: OAuth state + PKCE verifier are stored in sessionStorage.
    The callback is deliberately forced onto the exact registered origin
-   (www.kendbot.live), so the transaction remains same-origin.
+   (www.kendbot.xyz), so the transaction remains same-origin.
    ===================================================================== */
 const OAUTH_AUTH_BASE = "https://auth.deriv.com/oauth2";
 const OAUTH_SCOPE = "trade";
@@ -1185,7 +1185,7 @@ const OAUTH_CSRF_KEY = "accutrader_oauth_csrf";
 const OAUTH_VERIFIER_KEY = "accutrader_oauth_verifier";
 const OAUTH_STARTED_KEY = "accutrader_oauth_started";
 const OAUTH_MAX_AGE_MS = 10 * 60 * 1000;
-const OAUTH_CANONICAL_ORIGIN = "https://www.kendbot.live";
+const OAUTH_CANONICAL_ORIGIN = "https://www.kendbot.xyz";
 
 function randomBase64Url(byteLength = 32){
   const bytes = new Uint8Array(byteLength);
@@ -1269,7 +1269,7 @@ function canonicalOAuthStartUrl(){
 
 async function buildOAuthAuthorizationUrl(){
   if (!isCanonicalOAuthOrigin()){
-    throw new Error("OAuth login must be started from https://www.kendbot.live.");
+    throw new Error("OAuth login must be started from https://www.kendbot.xyz.");
   }
 
   const csrfToken = randomBase64Url(32);
